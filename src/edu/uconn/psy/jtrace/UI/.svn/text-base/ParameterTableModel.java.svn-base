@@ -1,0 +1,403 @@
+ 
+package edu.uconn.psy.jtrace.UI;
+import javax.swing.table.*;
+/**
+ *
+ * @author  tedstrauss
+ */
+public class ParameterTableModel extends javax.swing.table.AbstractTableModel {
+    // know our owner, so we know which data type to use
+    javax.swing.JTable owner;
+    
+    private String DOUBLE_TABLE_NAME = "parametersTable";
+    private String STRING_TABLE_NAME = "parametersStringTable";
+    private String INT_TABLE_NAME = "parametersIntTable";
+    
+    private boolean LOCKED = false;
+    // what goes into the table by default
+    private Object [][] stringData = {
+                {"Comment", new String(" "), new String(" "), new String(" ")},
+                {"User", new String(" "), new String(" "), new String(" ")},
+                {"Date", new String(" "), new String(" "), new String(" ")}
+    };
+    private Object [][] intData = {
+                {"FETSPREAD.pow", new Integer(6), new Integer(6), "Power feature spread"},
+                {"FETSPREAD.voc", new Integer(6), new Integer(6), "Vocalic feature spread"},
+                {"FETSPREAD.dif", new Integer(6), new Integer(6), "Diffuse feature spread"},
+                {"FETSPREAD.acu", new Integer(6), new Integer(6), "Acute feature spread"},
+                {"FETSPREAD.gra", new Integer(6), new Integer(6), "Gradiant/Consonental feature spread"},
+                {"FETSPREAD.voi", new Integer(6), new Integer(6), "Voiced feature spread"},
+                {"FETSPREAD.bur", new Integer(6), new Integer(6), "Burst feature spread"},
+                {"fSlices", new Integer(99), new Integer(99), "Number of time steps"},
+                {"deltaInput", new Integer(6), new Integer(6), "Input phoneme interval"},
+                {"nreps", new Integer(1), new Integer(1), "Input presentation rate"},
+                {"slicesPerPhon", new Integer(3), new Integer(3), "Phoneme/Word slices per Feature slice"}
+    };
+    private Object [][] doubleData = {
+                {"aLPHA[if]", new Double(1), new Double(1), "Input-Feature weights"},
+                {"aLPHA[fp]", new Double(0.02), new Double(0.02), "Feature-Phoneme weights"},
+                {"aLPHA[pw]", new Double(0.05), new Double(0.05), "Phoneme-Word weights"},
+                {"aLPHA[pf]", new Double(0), new Double(0), "Phoneme-Feature  weights (locked)"},
+                {"aLPHA[wp]", new Double(0.03), new Double(0.03), "Word-Phoneme weights"},
+                {"GAMMA[f]", new Double(0.04), new Double(0.04), "Feature-layer inhibition"},
+                {"GAMMA[p]", new Double(0.04), new Double(0.04), "Phoneme-layer inhibition"},
+                {"GAMMA[w]", new Double(0.03), new Double(0.03), "Word-layer inhibition"},
+                {"DECAY[f]", new Double(0.01), new Double(0.01), "Feature decay"},
+                {"DECAY[p]", new Double(0.03), new Double(0.03), "Phoneme decay"},
+                {"DECAY[w]", new Double(0.05), new Double(0.05), "Word decay"},
+                {"REST.F", new Double(-0.1), new Double(-0.1), "Feature resting activation"},
+                {"REST.P", new Double(-0.1), new Double(-0.1), "Phoneme resting activation"},
+                {"REST.W", new Double(-0.1), new Double(-0.1), "Word resting activation"},
+                {"Input Noise (SD)", new Double(0), new Double(0), ""},
+                {"Stochasticity (SD)", new Double(0), new Double(0), "McClelland: 0.02"},
+                {"spreadScale", new Double(1), new Double(1), "Scales FETSPREADs"},
+                {"min", new Double(-0.3), new Double(-0.3), "Minimum activation"},
+                {"max", new Double(1.0), new Double(1.0), "Maximum activation"},
+                {"frq resting levels", new Double(0), new Double(0), "Dahan et al.: 0.06"},
+                {"frq p->w wts", new Double(0), new Double(0), "Dahan et al.: 0.13"},
+                {"frq post-act", new Double(0), new Double(0), "Dahan et al.: c=15"}
+    };
+    
+    private String[] columnNames = {"Parameter","Value","Default", "Notes"};
+    public String getColumnName(int col) {
+        return columnNames[col];
+    }
+    
+    
+    //public ParameterTableModel() { super();}
+    public ParameterTableModel(javax.swing.JTable _o) {
+        super();
+        owner=_o;
+//        addTableModelListener(new javax.swing.event.TableModelListener(){        
+//            public void tableChanged(javax.swing.event.TableModelEvent e){
+//                //we could implement error checking here...                
+//            }
+//        });        
+    }    
+    
+    public Object getValueAt(int row, int col) {
+        Object ret;
+        if (owner.getName().equals(DOUBLE_TABLE_NAME))
+        {
+            // double version
+            if(row>=doubleData.length||col>=doubleData[0].length) 
+                return null;
+            if (col == 1 || col == 2)
+                ret = new Double(((Double)doubleData[row][col]).doubleValue());
+            else
+                ret = doubleData[row][col];
+        }
+        else if (owner.getName().equals(INT_TABLE_NAME))
+        {
+            //  int version
+            if(row>=intData.length||col>=intData[0].length) 
+                return null;
+            if (col == 1 || col == 2)
+                ret = new Integer(((Integer)intData[row][col]).intValue());
+            else
+                ret = intData[row][col];
+        }
+        else if (owner.getName().equals(STRING_TABLE_NAME))
+        {
+            // string version
+            if(row>=stringData.length||col>=stringData[0].length) 
+                return null;
+            ret = new String((String)stringData[row][col]);
+        }
+        else
+            ret = null;
+        
+        return ret;
+        
+    }
+    
+    public Object[] getValuesColumn(){
+        Object[] vals=new Object[getRowCount()];
+        for(int i=0;i<getRowCount();i++){
+            vals[i]=getValueAt(i,1);
+        }
+        return vals;
+    }
+
+    public Class getColumnClass(int c) {
+        //System.out.println("getColumnClass " + Integer.toString(c));
+        
+        //return java.lang.Object.class;
+        
+        Object o = getValueAt(0, c);
+        if (o != null)
+            return o.getClass();
+        else
+        {
+            o = getValueAt(0,c);
+        
+            return null;
+        }
+    }
+    public Class getCellClass(int r,int c){
+        return getValueAt(r, c).getClass();    
+    }
+    
+    public boolean isCellEditable(int row, int col) {
+        if(LOCKED) return false;
+        
+        String name = owner.getName();
+        
+        if (name == null)
+            return false;
+        
+        if (col == 1) 
+        {
+            if (name.equals(DOUBLE_TABLE_NAME) && row == 3)
+                return false;
+            else
+                return true;
+        } else {
+            return false;
+        }
+    }
+    public void lock(){ LOCKED=true;}
+    public void unlock(){ LOCKED=false;}
+    
+    public void setValueAt(Object value, int row, int col) {
+        //System.out.println("setValueAt: " + Integer.toString(row) + ", " + Integer.toString(col));
+        if (owner.getName().equals(DOUBLE_TABLE_NAME))
+        {
+            // double version
+            doubleData[row][col] = value;
+            
+        }
+        else if (owner.getName().equals(INT_TABLE_NAME))
+        {
+            //  int version
+            intData[row][col] = value;
+        }
+        else if (owner.getName().equals(STRING_TABLE_NAME))
+        {
+            // string version
+            if (value == null)
+                value = new String(" ");
+            stringData[row][col] = value;
+            //System.out.println("string!");
+        }
+        
+        //fireTableDataChanged();
+        fireTableCellUpdated(row, col);
+    }
+    
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    public int getRowCount() {
+        String name = owner.getName();
+        
+        if (name == null)
+            return 0;
+        
+        if (name.equals(DOUBLE_TABLE_NAME))
+        {
+            // double version
+            return doubleData.length;
+        }
+        else if (name.equals(INT_TABLE_NAME))
+        {
+            //  int version
+            return intData.length;
+        }
+        else if (name.equals(STRING_TABLE_NAME))
+        {
+            // string version
+            return stringData.length;
+        }
+        return 0;
+    }
+    
+    
+    
+    
+    
+    
+    /* Ted's model
+    private boolean DEBUG = false;
+    javax.swing.JTable owner;
+    boolean flagOne;
+    final static String slex="^,^br^pt,^dapt,^d^lt,^gri,^lat,^part,^pil,ark,ar,art,art^st,^slip,bar,bark,bi,bit,bist,blak,bl^d,blu,bab,babi,badi,bust,but,bat^l,baks,brid,brud,br^S,b^b^l,b^k,b^s,b^t,kar,kard,karp^t,sis,klak,kl^b,klu,kalig,kul,kap,kapi,k^p^l,krip,kru,krap,kruS^l,kru^l,kr^S,k^p,k^t,dark,dart,dil,did,dip,du,dal,dat,d^b^l,dru,drap,dr^g,d^k,d^l,d^st,duti,ist,it,glu,gad,gat,grik,grit,gru,grup,gard,g^tar,kip,ki,lid,lig,lip,list,lig^l,labi,lak,lup,lus,lat,l^k,l^ki,l^kS^ri,ad,pap^,park,part,parS^l,partli,parti,par,pi,pik,pip^l,pis,plat,pl^g,pl^s,pak^t,p^lis,pal^si,pul,pap,pas^b^l,pas^bli,pat,prist,prab^b^l,prab^bli,pradus,prad^kt,pragr^s,p^t,rid,ril,rili,rab,rak,rak^t,rad,rut,r^b,r^g^d,rul,rupi,r^S,r^s^l,skar,skul,skru,sil,sit,sikr^t,si,sid,sik,Sarp,Si,Sip,Sit,Sild,Sak,Sut,Sap,Sat,Sr^g,S^t,slip,slit,sl^g,sal^d,sari,spark,spik,spid,spat,star,start,start^l,stil,stip,stak,stap,strik,strit,str^k,str^g^l,st^did,st^di,stup^d,s^bst^tut,s^t^l,s^ksid,s^k,su,sut,sut^b^l,tar,targ^t,ti,tu,tul,tap,trit,triti,tri,trup,trat,tr^b^l,tr^k,tru,truli,tr^st,tr^sti,tub,^gli,^p,^s,-,";
+    final static String slex_frq="23248.0,37.0,71.0,50.0,264.0,50.0,57.0,108.0,50.0,4406.0,274.0,112.0,29.0,125.0,125.0,6382.0,87.0,50.0,118.0,122.0,143.0,45.0,23.0,341.0,23.0,34.0,95.0,87.0,25.0,26.0,77.0,32.0,31.0,34.0,4382.0,386.0,62.0,22.0,34.0,30.0,171.0,25.0,32.0,149.0,32.0,61.0,164.0,23.0,38.0,44.0,31.0,20.0,23.0,63.0,223.0,234.0,20.0,157.0,21.0,199.0,1366.0,23.0,28.0,83.0,69.0,196.0,58.0,21.0,36.0,78.0,95.0,183.0,300.0,28.0,332.0,482.0,66.0,38.0,64.0,545.0,82.0,24.0,348.0,125.0,517.0,83.0,38.0,343.0,77.0,22.0,109.0,23.0,68.0,169.0,49.0,25.0,24.0,53.0,40.0,242.0,625.0,25.0,49.0,275.0,10.0,24.0,24.0,887.0,221.0,57.0,28.0,72.0,64.0,159.0,290.0,129.0,31.0,373.0,61.0,37.0,33.0,24.0,261.0,256.0,195.0,141.0,63.0,273.0,261.0,275.0,40.0,121.0,20.0,29.0,69.0,35.0,20.0,215.0,20.0,60.0,21.0,22.0,694.0,45.0,40.0,99.0,105.0,809.0,84.0,128.0,115.0,2860.0,23.0,77.0,21.0,66.0,81.0,108.0,142.0,22.0,50.0,109.0,10.0,24.0,90.0,49.0,20.0,259.0,104.0,110.0,58.0,450.0,22.0,51.0,22.0,165.0,273.0,20.0,307.0,59.0,93.0,79.0,391.0,25.0,46.0,26.0,62.0,20.0,39.0,73.0,37.0,20.0,67.0,29.0,26162.0,79.0,212.0,127.0,24.0,161.0,82.0,20.0,189.0,84.0,237.0,237.0,76.0,35.0,55.0,30.0,1903.0,672.0,1000.0,";
+    // /** Creates a new instance of ParameterTableModel 
+    public ParameterTableModel() { super();}
+    public ParameterTableModel(javax.swing.JTable _o) {
+        super();
+        owner=_o;
+        flagOne=true;
+        addTableModelListener(new javax.swing.event.TableModelListener(){        
+            public void tableChanged(javax.swing.event.TableModelEvent e){
+                //we could implement error checking here...                
+            }
+        });        
+    }    
+    private String[] columnNames = {"Parameter","Value","Default"};
+    private javax.swing.JComboBox jcb = new javax.swing.JComboBox(columnNames);
+    
+    private Object[][] data = {
+        {" ", "", ""}, //0
+        {"lexicon", slex, "SLEX.xml"}, //1
+        {"frequencies",slex_frq,""}, //2
+        {"modelInput", new String("-pip^l-"),""}, //3
+        {"Ambiguous Phones","(click for setup)",new String("")}, //4        
+        {"date-time",(new java.util.Date(System.currentTimeMillis())).toString() ,(new java.util.Date(System.currentTimeMillis())).toString()}, //5
+        {"comment",new String("")  ,new String("")}, //6
+        {"user", new String(""), new String("user_name")}, //7
+        {"", "", ""}, //8
+        {"aLPHA[if]", new Double(1.0), new Double(1.0)}, //9
+        {"aLPHA[fp]", new Double(0.02), new Double(0.02)}, //10
+        {"aLPHA[pw]", new Double(0.05), new Double(0.05)}, //11
+        {"aLPHA[pf]", new Double(0.0), new Double(0.0)}, //12
+        {"aLPHA[wp]", new Double(0.03), new Double(0.03)}, //13
+        {"", "", ""}, //14
+        {"GAMMA[f]", new Double(0.04), new Double(0.04)}, //15
+        {"GAMMA[p]", new Double(0.04), new Double(0.04)}, //16
+        {"GAMMA[w]", new Double(0.03), new Double(0.03)}, //17
+        {"", "", ""}, //18
+        {"DECAY[f]", new Double(0.01), new Double(0.01)}, //19
+        {"DECAY[p]", new Double(0.03), new Double(0.03)}, //20
+        {"DECAY[w]", new Double(0.05), new Double(0.05)}, //21
+        {"", "", ""}, //22
+        {"FETSPREAD.pow", new Integer(3), new Integer(3)}, //23
+        {"FETSPREAD.voc", new Integer(6), new Integer(6)}, //24
+        {"FETSPREAD.dif", new Integer(6), new Integer(6)}, //25
+        {"FETSPREAD.acu", new Integer(9), new Integer(9)}, //26
+        {"FETSPREAD.gra", new Integer(9), new Integer(9)}, //27
+        {"FETSPREAD.voi", new Integer(3), new Integer(3)}, //28
+        {"FETSPREAD.bur", new Integer(3), new Integer(3)}, //29
+        {"", "", ""}, //30
+        {"REST.F", new Double(-0.1), new Double(-0.1)}, //31
+        {"REST.P", new Double(-0.1), new Double(-0.1)}, //32
+        {"REST.W", new Double(-0.01), new Double(-0.01)}, //33
+        {"", "", ""}, //34
+        {"Input Noise (SD)", new Double(0.0), new Double(0.0)}, //35
+        {"", "", ""}, //36
+        {"Stochasticity (SD)", new Double(0.0), "McClelland (1991): 0.02"}, //37
+        {"", "", ""}, //38
+        {"spreadScale", new Double(1.0), new Double(1.0)}, //39
+        {"min", new Double(-0.3), new Double(-0.3)}, //40
+        {"max", new Double(1.0), new Double(1.0)}, //41
+        {"fSlices", new Integer(66), new Integer(99)}, //42
+        {"deltaInput", new Integer(6), new Integer(6)}, //43         
+        {"nreps", new Integer(1), new Integer(1)}, //44
+        {"slicesPerPhon", new Integer(3), new Integer(3)}, //45
+        {"", "", ""}, //46
+        {"Frequency effects on:", "", ""}, //47
+        {"frq resting levels", "0.0", "Dahan et al: 0.06"}, //48  
+        {"frq p->w wts", "0.0", "Dahan et al: 0.13"}, //49              
+        {"frq post-act", "0.0", "Dahan et al: c=15"},  //50                   
+        {"", "", ""}, //51                    
+        {"", "", ""}}; //52
+        
+
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    public int getRowCount() {
+        return data.length;
+    }
+
+    public String getColumnName(int col) {
+        return columnNames[col];
+    }
+
+    public Object getValueAt(int row, int col) {
+        if(row>=data.length||col>=data[0].length) return null;
+        return data[row][col];
+    }
+    public Object[] getValuesColumn(){
+        Object[] vals=new Object[getRowCount()];
+        for(int i=0;i<getRowCount();i++){
+            vals[i]=getValueAt(i,1);
+        }
+        return vals;
+    }
+
+    /*
+     * JTable uses this method to determine the default renderer/
+     * editor for each cell.  If we didn't implement this method,
+     * then the last column would contain text ("true"/"false"),
+     * rather than a check box.
+     
+    public Class getColumnClass(int c) {
+        return getValueAt(0, c).getClass();
+    }
+    public Class getCellClass(int r,int c){
+        return getValueAt(r, c).getClass();    
+    }
+
+    /*
+     * Don't need to implement this method unless your table's
+     * editable.
+     
+    public boolean isCellEditable(int row, int col) {
+        //Note that the data/cell address is constant,
+        //no matter where the cell appears onscreen.
+        if (col == 1) {
+            if(row==12) return false;
+            if(row==4 && flagOne) popUpAmbiguityInfo();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*
+     * Don't need to implement this method unless your table's
+     * data can change.
+     
+    public void setValueAt(Object value, int row, int col) {
+        if (DEBUG) {
+            System.out.println("Setting value at " + row + "," + col
+                               + " to " + value
+                               + " (an instance of "
+                               + value.getClass() + ")");
+        }
+
+        data[row][col] = value;
+        fireTableDataChanged();
+        //fireTableCellUpdated(row, col);
+        
+        if (DEBUG) {
+            System.out.println("New value of data:");
+            printDebugData();
+        }
+    }
+
+    private void printDebugData() {
+        int numRows = getRowCount();
+        int numCols = getColumnCount();
+
+        for (int i=0; i < numRows; i++) {
+            System.out.print("    row " + i + ":");
+            for (int j=0; j < numCols; j++) {
+                System.out.print("  " + data[i][j]);
+            }
+            System.out.println();
+        }
+        System.out.println("--------------------------");
+    }
+    
+    public void popUpAmbiguityInfo(){        
+        javax.swing.JOptionPane prompt1=new javax.swing.JOptionPane("...",javax.swing.JOptionPane.INFORMATION_MESSAGE,javax.swing.JOptionPane.OK_OPTION);
+        String msg="Use this field to set up a continuum of ambiguous phonemes.\n"+
+                "Example: enter 'gk7' to create a 7-step continuum between phonemes\n"+
+                "/g/ and /k/.  Then, use the numbers 0 through 6 to represent the \n"+
+                "ambiguous phones in the model input field, where 0 and 6 represent\n"+
+                "unaltered /g/ and /k/, respectively.\n"+
+                "Maximum number of continuum steps = 9.\n"+
+                "Phonemes known to Trace: p, b, t, d, k, g, s, S, r, l, a, i, u, ^ and -\n"+
+                "Invalid entries will be ignored.  Others examples: 'ai5', 'tp9', etc.\n";
+        prompt1.showMessageDialog(owner,msg,"Instructions",javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        flagOne=false;    
+    }
+     *
+     **/
+    
+}

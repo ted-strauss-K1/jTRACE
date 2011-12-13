@@ -1,0 +1,216 @@
+/*
+ * QueryWorkhorse.java
+ *
+ * Created on May 5, 2005, 7:06 PM
+ */
+
+package edu.uconn.psy.jtrace.Model.Scripting.impl;
+import edu.uconn.psy.jtrace.Model.Scripting.*;
+import edu.uconn.psy.jtrace.Model.*;
+
+/**
+ *
+ * @author tedstrauss
+ */
+public class QueryWorkhorse extends Workhorse{
+    
+    /** Creates a new instance of QueryWorkhorse */
+    public QueryWorkhorse(TraceParam p, TraceSim s, TraceSimAnalysis g,edu.uconn.psy.jtrace.UI.GraphParameters gp,TraceScript scr){
+        super(p,s,g,gp,scr);
+    }
+    public Primitive evaluateQuery(Query qry)throws JTraceScriptingException{
+        String name=qry.name();
+        String returnType=qry.returnType();
+        Primitive[] args=qry.arguments();
+        args=currScript.replaceQueriesWithValues(args);
+        
+        
+        /* From jTRACESchema.xsd
+        <xsd:element name="item-with-highest-peak">
+        <xsd:element name="value-of-highest-peak">
+        <xsd:element name="item-with-nth-highest-peak">
+        <xsd:element name="value-of-nth-highest-peak">
+        <xsd:element name="nth-item-in-lexicon">
+        <xsd:element name="current-input">
+        <xsd:element name="peak-value-of-item">
+        <xsd:element name="cycle-when-item-exceeds-threshold">
+        <xsd:element name="nth-item-to-exceed-threshold">
+        <xsd:element name="McClellend-1991-running-average-metric">
+                        
+         */
+        
+        //QUERIES FOR ACCESSING PARAMETERS, LEXICON
+        if(name.equals("current-input")){
+            if(args.length!=0)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'model-input-value\' : takes no argument");
+            return new Text(currParam.getModelInput());    
+            //return new Text(currSim.getInputString());    
+        } 
+        else if(name.equals("fetch-current-value-of-a-parameter")){
+            if(args.length!=1)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'fetch-current-value-of-a-parameter\' : requires one argument (Text)");
+            return new Text(fetchValueOfParam(args[0].textValue().value()));
+        }        
+        else if(name.equals("nth-item-in-lexicon")){
+            if(args.length!=1)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'nth-item-in-lexicon\' : requires one argument (Int)");
+            return new Text(currParam.getDictionary().get(args[0].intValue().value()).getPhon());    
+        }
+        /*else if(name.equals("item-is-in-lexicon")){
+            if(args.length!=1||null==args[0].textValue())
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'item-is-in-lexicon\' : requires one argument (Text)");
+            return new edu.uconn.psy.jtrace.Model.Scripting.Boolean(currParam.getDictionary().toString()==new String("xc"));  //TODO    
+        }*/        
+        //QUERIES FOR ACCESSING DETAILS ABOUT GRAPH ANALYSES: DECISION RULES
+        else if(name.equals("decision-rule-report")){
+            if(args.length!=3)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'decision-rule-report\' : takes 3 arguments (Decimal, Text, Int)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            Primitive value = qry.arguments()[1];
+            if(value.queryValue()!=null)
+                value = currScript.interpretQuery(value.queryValue());            
+            return new Text(decision.decisionRuleReport(args[0].decimalValue().value(),value.textValue().value()));
+        }
+        
+        else if(name.equals("item-with-highest-peak")){
+            if(args.length!=0)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'nth-item-in-lexicon\' : takes no argument");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Text(decision.itemWithHighestPeak());
+        }
+        else if(name.equals("value-of-highest-peak")){
+            if(args.length!=0)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'nth-item-in-lexicon\' : takes no argument");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Decimal(decision.highestPeak());
+        }
+        else if(name.equals("cycle-when-item-exceeds-threshold")){
+            if(args.length!=2)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'cycle-when-item-exceeds-thresh\' : takes two arguments (Text, Decimal)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Int(decision.rtForItem(args[0].textValue().value(),args[1].decimalValue().value()));
+        }
+        else if(name.equals("nth-item-to-exceed-threshold")){
+            if(args.length!=1)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'nth-item-to-exceed-given-thresh\' : takes one argument (Int)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Text(decision.nthItemToThreshold(args[0].intValue().value(),args[1].decimalValue().value()));
+        }
+        else if(name.equals("peak-value-of-item")){
+            if(args.length!=1)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'peak-value-of-lexical-item\' : takes one argument (Text)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            Primitive value = qry.arguments()[0];
+            if(null != value.queryValue())
+                value = currScript.interpretQuery(value.queryValue());            
+            return new Decimal(decision.peakValueOfItem(value.textValue().value()));
+        }
+        else if(name.equals("item-with-nth-highest-peak")){
+            if(args.length!=1)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'item-with-nth-highest-peak\' : takes one argument (Int)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Text(decision.nthHighestPeakItem(args[0].intValue().value()));
+        }
+        else if(name.equals("value-of-nth-highest-peak")){
+            if(args.length!=1)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'value-of-nth-highest-peak\' : takes one argument (Int)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());            
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Decimal(decision.nthHighestPeakValue(args[0].intValue().value()));
+        }
+        else if(name.equals("McClellend-1991-running-average-metric")){
+            if(args.length!=5)
+                throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : arguments incorrect for query \'McClellend-1991-running-average-metric\' : takes four arguments (String, String, Int, Decimal, Decimal)");
+            currSim = new TraceSim(currParam);
+            currSim.cycle(currScript.getCyclesPerSim());           
+            //set phoneme activation settings for the currAnalysis:
+            currAnalysis.setAlignment(args[2].intValue().value());
+            currAnalysis.setContentType(currAnalysis.ACTIVATIONS);
+            currAnalysis.setDomain(currAnalysis.PHONEMES);
+            currAnalysis.setWatchType(currAnalysis.WATCHSPECIFIED);
+            currAnalysis.setItemsToWatch(TracePhones.labels);
+            //did i forget something?
+            TraceDecisionRule decision = new TraceDecisionRule(currAnalysis.doAnalysis(currSim));
+            return new Text(decision.runningAverageMetricReport(args[0].textValue().value(),args[1].textValue().value(),currSim.getInputString(),args[3].decimalValue().value(),args[4].decimalValue().value()));
+        }
+        else{
+            throw new JTraceScriptingException("QueryWorkhorse.evaluateQuery() : unrecognized query name.");
+        }
+    }  
+    
+    public String fetchValueOfParam(String name){
+        if(name.equalsIgnoreCase("user")) return currParam.getUser();
+        else if(name.equalsIgnoreCase("dateTime")) return currParam.getDateTime();
+        else if(name.equalsIgnoreCase("comment")) return currParam.getComment();
+        else if(name.equalsIgnoreCase("modelInput")) return currParam.getModelInput();
+        
+        else if(name.equalsIgnoreCase("spread.1")) return (new Int(currParam.getSpread()[0])).toString();
+        else if(name.equalsIgnoreCase("spread.2")) return (new Int(currParam.getSpread()[1])).toString();
+        else if(name.equalsIgnoreCase("spread.3")) return (new Int(currParam.getSpread()[2])).toString();
+        else if(name.equalsIgnoreCase("spread.4")) return (new Int(currParam.getSpread()[3])).toString();
+        else if(name.equalsIgnoreCase("spread.5")) return (new Int(currParam.getSpread()[4])).toString();
+        else if(name.equalsIgnoreCase("spread.6")) return (new Int(currParam.getSpread()[5])).toString();
+        else if(name.equalsIgnoreCase("spread.7")) return (new Int(currParam.getSpread()[6])).toString();
+        
+        else if(name.equalsIgnoreCase("spreadscale.1")) return (new Double(currParam.getSpreadScale()[0])).toString();
+        else if(name.equalsIgnoreCase("spreadscale.2")) return (new Double(currParam.getSpreadScale()[1])).toString();
+        else if(name.equalsIgnoreCase("spreadscale.3")) return (new Double(currParam.getSpreadScale()[2])).toString();
+        else if(name.equalsIgnoreCase("spreadscale.4")) return (new Double(currParam.getSpreadScale()[3])).toString();
+        else if(name.equalsIgnoreCase("spreadscale.5")) return (new Double(currParam.getSpreadScale()[4])).toString();
+        else if(name.equalsIgnoreCase("spreadscale.6")) return (new Double(currParam.getSpreadScale()[5])).toString();
+        else if(name.equalsIgnoreCase("spreadscale.7")) return (new Double(currParam.getSpreadScale()[6])).toString();
+        
+        else if(name.equalsIgnoreCase("min")) return new String(currParam.getMin()+"");
+        else if(name.equalsIgnoreCase("max")) return new String(currParam.getMax()+"");
+        else if(name.equalsIgnoreCase("nreps")) return new String(currParam.getNReps()+"");
+        else if(name.equalsIgnoreCase("slicesPerPhon")) return new String(currParam.getSlicesPerPhon()+"");
+        else if(name.equalsIgnoreCase("fslices")) return new String(currParam.getFSlices()+"");
+        else if(name.equalsIgnoreCase("decay.F")) return new String(currParam.getDecay().F+"");
+        else if(name.equalsIgnoreCase("decay.P")) return new String(currParam.getDecay().P+"");
+        else if(name.equalsIgnoreCase("decay.W")) return new String(currParam.getDecay().W+"");
+        else if(name.equalsIgnoreCase("rest.F")) return new String(currParam.getRest().F+"");
+        else if(name.equalsIgnoreCase("rest.P")) return new String(currParam.getRest().P+"");
+        else if(name.equalsIgnoreCase("rest.W")) return new String(currParam.getRest().W+"");
+        else if(name.equalsIgnoreCase("alpha.if")) return new String(currParam.getAlpha().IF+"");
+        else if(name.equalsIgnoreCase("alpha.fp")) return new String(currParam.getAlpha().FP+"");
+        else if(name.equalsIgnoreCase("alpha.pf")) return new String(currParam.getAlpha().PF+"");
+        else if(name.equalsIgnoreCase("alpha.pw")) return new String(currParam.getAlpha().PW+"");
+        else if(name.equalsIgnoreCase("alpha.wp")) return new String(currParam.getAlpha().WP+"");
+        else if(name.equalsIgnoreCase("gamma.F")) return new String(currParam.getGamma().F+"");
+        else if(name.equalsIgnoreCase("gamma.P")) return new String(currParam.getGamma().P+"");
+        else if(name.equalsIgnoreCase("gamma.W")) return new String(currParam.getGamma().W+"");
+        else if(name.equalsIgnoreCase("deltaInput")) return new String(currParam.getDeltaInput()+"");
+        else if(name.equalsIgnoreCase("noiseSD")) return new String(currParam.getNoiseSD()+"");
+        else if(name.equalsIgnoreCase("stochasticitySD")) return new String(currParam.getStochasticitySD()+"");
+        else if(name.equalsIgnoreCase("continuumSpec")) return new String(currParam.getContinuumSpec());
+        
+        else if(name.equalsIgnoreCase("freqNode.RDL_wt")) return new String(currParam.getFreqNode().RDL_wt+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_wt_c")) return new String(currParam.getFreqNode().RDL_wt_c+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_wt_s")) return new String(currParam.getFreqNode().RDL_wt_s+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_rest")) return new String(currParam.getFreqNode().RDL_rest+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_rest_c")) return new String(currParam.getFreqNode().RDL_rest_c+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_rest_s")) return new String(currParam.getFreqNode().RDL_rest_s+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_post")) return new String(currParam.getFreqNode().RDL_post+"");
+        else if(name.equalsIgnoreCase("freqNode.RDL_psot_c")) return new String(currParam.getFreqNode().RDL_post_c+"");
+        
+        else if(name.equalsIgnoreCase("lexicon")) return new String(currParam.getDictionary().toString());
+        else if(name.equalsIgnoreCase("dictionary")) return new String(currParam.getDictionary().toString());
+        
+        return "";        
+    }
+}

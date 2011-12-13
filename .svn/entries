@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="202"
+   name=""
+   committed-date="2005-07-14T15:46:44.305451Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   name="ctrace"
+   kind="dir"/>
+<entry
+   name="nbproject"
+   kind="dir"/>
+<entry
+   name="src"
+   kind="dir"/>
+<entry
+   committed-rev="190"
+   name="manifest.mf"
+   text-time="2005-07-06T17:34:01.000000Z"
+   committed-date="2005-07-06T17:33:07.340763Z"
+   checksum="ea80202c7e8a84b5de2bcc2d568c2808"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T17:33:34.000000Z"/>
+<entry
+   committed-rev="190"
+   name="makesrczip"
+   text-time="2005-07-06T17:34:01.000000Z"
+   committed-date="2005-07-06T17:33:07.340763Z"
+   checksum="398bf6f6f84643520f3abbefa29cc29b"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T17:33:34.000000Z"/>
+<entry
+   name="package"
+   kind="dir"/>
+<entry
+   committed-rev="198"
+   name="programmers-guide.html"
+   text-time="2005-07-14T13:46:26.000000Z"
+   committed-date="2005-07-13T23:05:38.897863Z"
+   checksum="82536ea82b20322b22d6a655164dc554"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T13:46:26.000000Z"/>
+<entry
+   committed-rev="4"
+   name="build.xml"
+   text-time="2005-03-30T20:33:58.000000Z"
+   committed-date="2005-03-29T15:50:22.085908Z"
+   checksum="bafc18507c12e437eeff13a4fac4a5e9"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-03-30T20:33:58.000000Z"/>
+</wc-entries>

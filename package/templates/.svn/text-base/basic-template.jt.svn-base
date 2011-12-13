@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jaxfront version=1.60;time=2005-07-04 16:33:35.702;xui=jt.xui?>
+<jt xmlns="http://xml.netbeans.org/examples/targetNS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.netbeans.org/examples/targetNS jTRACESchema.xsd">
+   <script>
+         <iterate>
+               <incrementing-value>
+                  <target-parameter>gamma.p</target-parameter>
+                  <type>decimal</type>
+                  <from>0.0</from>
+                  <to>0.04</to>
+                  <number-of-steps>3</number-of-steps>
+               </incrementing-value>
+            <instruction>
+               <action>
+                  <set-cycles-per-sim>
+                     <cycles>65</cycles>
+                  </set-cycles-per-sim>
+               </action>
+            </instruction>
+            <instruction>
+               <action>
+                  <new-window>
+                     <arg>n/a</arg>
+                  </new-window>
+               </action>
+            </instruction>
+         </iterate>
+   </script>
+</jt>

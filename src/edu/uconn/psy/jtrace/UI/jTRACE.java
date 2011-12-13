@@ -1,0 +1,628 @@
+       
+/*
+ * JDialogOne.java
+ *
+ * Created on April 15, 2004, 10:29 AM
+ */
+
+package edu.uconn.psy.jtrace.UI;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import edu.uconn.psy.jtrace.Model.*;
+import edu.uconn.psy.jtrace.UI.*;
+
+/**
+ *
+ * @author  tedstrauss
+ */
+public class jTRACE extends javax.swing.JInternalFrame { 
+    // swing objects
+    private JTabbedPane tabbedPanel;
+    
+    // static properties object. 
+    private static traceProperties properties;
+    
+    // model objects
+    // each jTRACE object should have a TraceSim object and a TraceParam
+    // object and a GraphParameters object and a TraceSimAnalysis object.
+    // All are shared among the panels of this model object.
+    private TraceSim sim;
+    private TraceParam param;
+    private TraceSimAnalysis simAnalysis;
+    private GraphParameters graphParams;
+    
+    // panel objects
+    private ParametersPanel paramPanel;
+    private SimPanel simPanel;
+    private GraphPanel graphPanel;
+    private PhonemePanel phonemePanel;
+    private InputPanel inputPanel;
+    
+    // things related to tasks and threading
+    private javax.swing.JProgressBar progressBar;
+    private javax.swing.JFrame progressFrame;
+    private javax.swing.JLabel progressLabel;
+    private javax.swing.Timer progressTimer;
+    //private edu.uconn.psy.jtrace.IO.simTask task;
+    
+    // stuff related to MDI
+    //static int openFrameCount = 0;
+    private boolean isValidationFrame;
+    private File jtFilename;
+    private String windowTitle;
+    public static final int xOffset = 30, yOffset = 30;
+    private long lastSavedParamUpdateCt;    // so we can tell if we need to be saved
+    
+    // tab titles
+    private String tab;
+    private String prevtab;
+    private static final String TAB_TITLE_INPUT = "Input";    
+    private static final String TAB_TITLE_PHONEMES = "Phonemes";
+    private static final String TAB_TITLE_LEXICON = "Lexicon";
+    private static final String TAB_TITLE_PARAMETERS = "Parameters";
+    private static final String TAB_TITLE_SIMULATION = "Simulation";
+    private static final String TAB_TITLE_GRAPHING = "Graphing";
+    private static final String TAB_TITLE_SCRIPTS = "Scripts";
+    
+    // tab indices
+    public static final int TAB_INDEX_INPUT = 0;
+    public static final int TAB_INDEX_PHONEMES = 1;
+    //public static final int TAB_INDEX_LEXICON = 2;
+    public static final int TAB_INDEX_PARAMETERS = 2;
+    public  static final int TAB_INDEX_SIMULATION = 3;
+    public static final int TAB_INDEX_GRAPHING = 4;
+    
+    
+    /**
+     * Constructor with specified model objects and associated file.
+     * This is the real one.
+     *
+     * @param props     application properties
+     * @param param     TraceParam
+     * @param sim       TraceSim (if null, will be constructed from param)
+     * @param anal      TraceSimAnalysis
+     * @param graphParam    GraphParameters
+     * @param file      associated file (if null, title will come from jTRACEMDI)
+     */
+    public jTRACE(traceProperties _props, TraceParam _param, TraceSim _sim, TraceSimAnalysis _anal, 
+            GraphParameters _graphParam, File _file)
+    {
+        super("jTRACE",     // default title, will change later
+              true, //resizable
+              true, //closable -- although we'll handle it ourselves in jTRACEMDI
+              true, //maximizable
+              true);//iconifiable
+        
+        // see jTRACEMDI.internalFrameClosing()
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        
+        if (_file != null)
+        {
+            setJtFilename(_file);
+            //windowTitle = getJtFilename().getName();
+        }
+        else
+        {
+            setJtFilename(null);
+            windowTitle = jTRACEMDI.getNextTitle();
+        }
+        
+        setTitle(windowTitle);
+        isValidationFrame = false;
+        properties = _props;
+        
+        // use the passed-in objects                
+        param = _param;
+        if (_sim == null)
+            sim = new TraceSim(param);
+        else
+            sim = _sim;  
+                    
+        simAnalysis = _anal;
+        graphParams = _graphParam;
+                
+        initComponents();
+        
+        // set the non-maximized size to 1000x700
+        setSize(800, 650);      
+        setLocation(xOffset * jTRACEMDI.getCreatedWindows(), yOffset * jTRACEMDI.getCreatedWindows());
+        
+        // for some unclear reason, something in initComponents updates the
+        // param update count, so update here rather than earlier.
+        lastSavedParamUpdateCt = param.getUpdateCt();
+        
+    }
+    
+    /**
+     * Constructor with specified model objects and no title.
+     *
+     * @param props     application properties
+     * @param param     TraceParam
+     * @param sim       TraceSim (if null, will be constructed from param)
+     * @param anal      TraceSimAnalysis
+     * @param graphParam    GraphParameters
+     */
+    public jTRACE(traceProperties _props, TraceParam _param, TraceSim _sim, TraceSimAnalysis _anal, GraphParameters _graphParam)
+    {
+        this (_props, _param, _sim, _anal, _graphParam, null);
+        
+        
+    }
+    /** 
+     * Constructor with default model objects.
+     */
+    public jTRACE(traceProperties _props) 
+    {
+        this(_props, new TraceParam(), null, new TraceSimAnalysis(), new GraphParameters(), null);
+        
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.  
+     */
+    private void initComponents() {
+        
+        java.awt.GridBagConstraints gridBagConstraints;        
+        tabbedPanel = new javax.swing.JTabbedPane();        
+        
+        getContentPane().setLayout(new java.awt.GridBagLayout());        
+        //setTitle("jTrace");
+        setBackground(java.awt.Color.white);
+        //setResizable(false);
+        //setModal(true);        
+        
+        tabbedPanel.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPanel.setTabPlacement(javax.swing.JTabbedPane.TOP);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weightx = 1.0;
+        getContentPane().add(tabbedPanel, gridBagConstraints);
+        
+        // for starters, add all three main panels        
+        phonemePanel = new PhonemePanel(param);
+        tabbedPanel.addTab(TAB_TITLE_PHONEMES, phonemePanel);
+        
+        inputPanel = new InputPanel(param, sim);
+        tabbedPanel.addTab(TAB_TITLE_INPUT, inputPanel);
+        
+        paramPanel = new ParametersPanel(param);
+        tabbedPanel.addTab(TAB_TITLE_PARAMETERS, paramPanel);
+        
+        simPanel = new SimPanel(param, sim);
+        simPanel.addPropertyChangeListener("isValidationFrame", new java.beans.PropertyChangeListener(){
+                public void propertyChange(java.beans.PropertyChangeEvent evt){
+                    if(((Boolean)evt.getNewValue()).booleanValue()){
+                        paramPanel.lock();
+                        windowTitle = windowTitle.concat(" - VALIDATION");
+                        setTitle(windowTitle);
+                        isValidationFrame = true;
+                        fireInternalFrameEvent(javax.swing.event.InternalFrameEvent.INTERNAL_FRAME_ACTIVATED);
+                    }
+                }            
+            });
+        tabbedPanel.addTab(TAB_TITLE_SIMULATION, simPanel);
+        
+        graphPanel = new GraphPanel(sim, simAnalysis, graphParams);
+        tabbedPanel.addTab(TAB_TITLE_GRAPHING, graphPanel);
+        
+        tabbedPanel.setSelectedIndex(TAB_INDEX_PARAMETERS);
+        
+        // and register the listener to detect for tab click events
+        tabbedPanel.addChangeListener(new jTRACE_tabbedPanel_changeAdapter(this));                
+    }
+    
+    public void setFrameAll(int n){        
+        simPanel.setFrameAll(n);
+    }
+    
+    public String getWindowTitle()
+    {
+        return windowTitle;
+    }
+    
+    public void setWindowTitle(String wt)
+    {
+        windowTitle = wt;
+        setTitle(windowTitle);
+    }
+    
+    /** 
+     * If a tab is selected, what to do?
+     */
+    void tabbedPanel_stateChanged(ChangeEvent e) {
+        prevtab = tab;
+        JTabbedPane tabSource = (JTabbedPane) e.getSource();
+        tab = tabSource.getTitleAt(tabSource.getSelectedIndex());
+        
+        // first, take care of any business that leaving the previous tab necessitates
+        if (prevtab==null){
+            // do nothing!
+        }
+        else if (prevtab.equals(TAB_TITLE_PHONEMES)) {
+            // if some phonemes have changed, making the input string obsolete,            
+            // then change those phones to something inocuous.
+            param.verifyModelInput();
+            param.verifyLexicon();
+        }
+        
+        // now switch to the new tab, and initialize accordingly
+        if (tab.equals(TAB_TITLE_SIMULATION)) {
+            // we need to tell the simulation to check if the parameters have changed
+            // so it can reset itself if need be!
+            //System.out.println("Switching to sim panel...");
+            simPanel.checkForParamUpdate();
+        }
+        else if (tab.equals(TAB_TITLE_GRAPHING))
+        {
+            //make sure the sim object is up to date
+            //simPanel.checkForParamUpdateDontReset();
+            // tell the graph panel to update itself
+            // sim.setParameters(param); // neccessary?
+            graphPanel.guiFromGraphParams();
+            graphPanel.updateGraph();
+        }
+        else if (tab.equals(TAB_TITLE_PARAMETERS))
+        {
+            // the only parameter that can be changed externally is the model input
+            paramPanel.setParameters(param); // reset from parameters object
+        }
+        else if (tab.equals(TAB_TITLE_PHONEMES))
+        {
+            // 
+            phonemePanel.notify(param);
+        }
+        else if (tab.equals(TAB_TITLE_INPUT))
+        {
+            //todo: make the sim object update only if something relevant has changed. 
+            sim = new TraceSim(param);
+            inputPanel.notify(param,sim);            
+        }        
+  }
+
+    // these are used by, for example, File...Clone
+    public TraceSim getSim() {
+        return sim;
+    }
+
+    public void setSim(TraceSim sim) {
+        this.sim = sim;
+    }
+
+    public TraceParam getParam() {
+        return param;
+    }
+
+    public void setParam(TraceParam param) {
+        this.param = param;
+    }
+
+    public TraceSimAnalysis getSimAnalysis() {
+        return simAnalysis;
+    }
+
+    public void setSimAnalysis(TraceSimAnalysis simAnalysis) {
+        this.simAnalysis = simAnalysis;
+    }
+
+    public GraphParameters getGraphParams() {
+        return graphParams;
+    }
+
+    public void setGraphParams(GraphParameters graphParams) {
+        this.graphParams = graphParams;
+    }
+
+    public File getJtFilename() {
+        return jtFilename;
+    }
+
+    public void setJtFilename(File jtFilename) {
+        this.jtFilename = jtFilename;
+        
+        if (jtFilename != null)
+        {
+            setWindowTitle(jtFilename.getName());
+        }
+    }
+    public void setActiveTab(int tab)
+    {        
+        tabbedPanel.setSelectedIndex(tab);
+    }
+    public boolean needToSave() 
+    {
+        return lastSavedParamUpdateCt < param.getUpdateCt();
+    }
+    public boolean isValidationFrame(){
+        return isValidationFrame;
+    }
+
+    /**
+     * Getter for property graphPanel.
+     * @return Value of property graphPanel.
+     */
+    public GraphPanel getGraphPanel() {
+
+        return this.graphPanel;
+    }
+    
+    public void youveBeenSaved()
+    {
+        lastSavedParamUpdateCt = param.getUpdateCt();
+    }    
+    
+}
+
+class jTRACE_tabbedPanel_changeAdapter implements javax.swing.event.ChangeListener {
+  jTRACE adaptee;
+
+  jTRACE_tabbedPanel_changeAdapter(jTRACE adaptee) {
+    this.adaptee = adaptee;
+  }
+  public void stateChanged(ChangeEvent e) {
+    adaptee.tabbedPanel_stateChanged(e);
+  }
+  
+  public void validationTest(){        
+        //run the SMAD metric for each word pair in the current lexicon.
+//        edu.uconn.psy.jtrace.UI.ParameterTable pTable=setupPanel.getParamaterTable();
+//        Object[] data=new Object[pTable.getModel().getRowCount()];
+//        for(int i=0;i<pTable.getModel().getRowCount();i++){
+//            data[i]=pTable.getModel().getValueAt(i,1);            
+//        }
+//        edu.uconn.psy.jtrace.Model.TraceParam param=new edu.uconn.psy.jtrace.Model.TraceParam(data);
+//        edu.uconn.psy.jtrace.Model.Dictionary dict=setupPanel.getLexicon();        
+//        param.setLexicon(dict);
+//        edu.uconn.psy.jtrace.Model.TraceNet model1;
+//        edu.uconn.psy.jtrace.Model.TraceNet model2;
+//        double[][][][] d1; 
+//        double[][][][] d2;
+//        double SMAD;
+//        double MAX=0;
+//        for(int i=0;i<dict.size();i++){
+//            System.out.println();
+//            SMAD=0;
+//            MAX=0;
+//            model1=new edu.uconn.psy.jtrace.Model.TraceNet(param);
+//            model1.createInput("-".concat(dict.elementAt(i).getPhon()).concat("-"));            
+//            d1=new double[4][][][];
+//            d1[0]=new double[90][model1.getInputLayer().length][model1.getInputLayer()[0].length];
+//            d1[1]=new double[90][model1.getFeatureLayer().length][model1.getFeatureLayer()[0].length];
+//            d1[2]=new double[90][model1.getPhonemeLayer().length][model1.getPhonemeLayer()[0].length];
+//            d1[3]=new double[90][model1.getWordLayer().length][model1.getWordLayer()[0].length];            
+//            //first cycle
+//            for(int j=0;j<model1.getInputLayer().length;j++)
+//                for(int k=0;k<model1.getInputLayer()[0].length;k++)
+//                    d1[0][0][j][k]=model1.getInputLayer()[j][k];
+//            for(int j=0;j<model1.getFeatureLayer().length;j++)
+//                for(int k=0;k<model1.getFeatureLayer()[0].length;k++)
+//                    d1[1][0][j][k]=model1.getFeatureLayer()[j][k];
+//            for(int j=0;j<model1.getPhonemeLayer().length;j++)
+//                for(int k=0;k<model1.getPhonemeLayer()[0].length;k++)
+//                    d1[2][0][j][k]=model1.getPhonemeLayer()[j][k];
+//            for(int j=0;j<model1.getWordLayer().length;j++)
+//                for(int k=0;k<model1.getWordLayer()[0].length;k++)
+//                    d1[3][0][j][k]=model1.getWordLayer()[j][k];
+//            //subsequent cycles
+//            for(int cyc=1;cyc<90;cyc++){
+//                //double D[][][]={wordLayer,featLayer,phonLayer,inputLayer};                 
+//                double[][][] D=model1.cycle(); 
+//                for(int j=0;j<model1.getInputLayer().length;j++)
+//                    for(int k=0;k<model1.getInputLayer()[0].length;k++)
+//                        d1[0][cyc][j][k]=D[3][j][k];
+//                for(int j=0;j<model1.getFeatureLayer().length;j++)
+//                    for(int k=0;k<model1.getFeatureLayer()[0].length;k++)
+//                        d1[1][cyc][j][k]=D[1][j][k];
+//                for(int j=0;j<model1.getPhonemeLayer().length;j++)
+//                    for(int k=0;k<model1.getPhonemeLayer()[0].length;k++)
+//                        d1[2][cyc][j][k]=D[2][j][k];
+//                for(int j=0;j<model1.getWordLayer().length;j++)
+//                    for(int k=0;k<model1.getWordLayer()[0].length;k++)
+//                        d1[3][cyc][j][k]=D[0][j][k];
+//            }        
+//            for(int h=0;h<dict.size();h++){
+//                SMAD=0;
+//                MAX=0;
+//                model2=new edu.uconn.psy.jtrace.Model.TraceNet(param);
+//                model2.createInput("-".concat(dict.elementAt(h).getPhon()).concat("-"));
+//                
+//                d2=new double[4][][][];
+//                d2[0]=new double[90][model2.getInputLayer().length][model2.getInputLayer()[0].length];
+//                d2[1]=new double[90][model2.getFeatureLayer().length][model2.getFeatureLayer()[0].length];
+//                d2[2]=new double[90][model2.getPhonemeLayer().length][model2.getPhonemeLayer()[0].length];
+//                d2[3]=new double[90][model2.getWordLayer().length][model2.getWordLayer()[0].length];            
+//                //first cycle
+//                for(int j=0;j<model2.getInputLayer().length;j++)
+//                    for(int k=0;k<model2.getInputLayer()[0].length;k++)
+//                        d2[0][0][j][k]=model2.getInputLayer()[j][k];
+//                for(int j=0;j<model2.getFeatureLayer().length;j++)
+//                    for(int k=0;k<model2.getFeatureLayer()[0].length;k++)
+//                        d2[1][0][j][k]=model2.getFeatureLayer()[j][k];
+//                for(int j=0;j<model2.getPhonemeLayer().length;j++)
+//                    for(int k=0;k<model2.getPhonemeLayer()[0].length;k++)
+//                        d2[2][0][j][k]=model2.getPhonemeLayer()[j][k];
+//                for(int j=0;j<model2.getWordLayer().length;j++)
+//                    for(int k=0;k<model2.getWordLayer()[0].length;k++)
+//                        d2[3][0][j][k]=model2.getWordLayer()[j][k];
+//                //subsequent cycles
+//                for(int cyc=1;cyc<90;cyc++){
+//                    //double D[][][]={wordLayer,featLayer,phonLayer,inputLayer};                 
+//                    double[][][] D=model2.cycle(); 
+//                    for(int j=0;j<model2.getInputLayer().length;j++)
+//                        for(int k=0;k<model2.getInputLayer()[0].length;k++)
+//                            d2[0][cyc][j][k]=D[3][j][k];
+//                    for(int j=0;j<model2.getFeatureLayer().length;j++)
+//                        for(int k=0;k<model2.getFeatureLayer()[0].length;k++)
+//                            d2[1][cyc][j][k]=D[1][j][k];
+//                    for(int j=0;j<model2.getPhonemeLayer().length;j++)
+//                        for(int k=0;k<model2.getPhonemeLayer()[0].length;k++)
+//                            d2[2][cyc][j][k]=D[2][j][k];
+//                    for(int j=0;j<model2.getWordLayer().length;j++)
+//                        for(int k=0;k<model2.getWordLayer()[0].length;k++)
+//                            d2[3][cyc][j][k]=D[0][j][k];
+//                }
+//                double val;
+//                for(int o=0;o<d1.length;o++)
+//                    for(int p=0;p<d1[o].length;p++)
+//                        for(int q=0;q<d1[o][p].length;q++)
+//                            for(int r=0;r<d1[o][p][q].length;r++){     
+//                                //System.out.print(p+" ");
+//                                val=Math.abs(((d1[o][p][q][r]+0.3)/1.3)-((d2[o][p][q][r]+0.3)/1.3));    
+//                                if(val>MAX){ MAX=val;
+//                                    if(MAX>1.3){ 
+//                                        if(o==3) System.out.print(dict.get(q).getPhon()+"\t");
+//                                        System.out.print(d1[o][p][q][r]+"\t"+d2[o][p][q][r]+"\t"+o+"\t"+p+"\t"+q+"\t"+r+"\t\t");
+//                                    }
+//                                }
+//                                SMAD+=val;                                                                
+//                            }
+//                int numberOfCells=0;
+//                numberOfCells+=(90*model1.getInputLayer().length*model1.getInputLayer()[0].length);
+//                numberOfCells+=(90*model1.getFeatureLayer().length*model1.getFeatureLayer()[0].length);
+//                numberOfCells+=(90*model1.getPhonemeLayer().length*model1.getPhonemeLayer()[0].length);
+//                numberOfCells+=(90*model1.getWordLayer().length*model1.getWordLayer()[0].length);            
+//                
+//                SMAD/=numberOfCells;
+//                SMAD*=100;
+//                MAX*=100;
+//                System.out.print(SMAD+","+MAX+"\t");
+//                model2.gc();
+//                model2=null;
+//            }   
+//            model1.gc();
+//            model1=null;
+//        }
+        
+    }
+    public void regressionTest(java.awt.event.MouseEvent evt){
+//        javax.swing.JOptionPane prompt1=new javax.swing.JOptionPane("...",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_OPTION);
+//        String msg="REGRESSION TEST : compare jTrace to cTrace simulations\n"+
+//            "Warning: this feature takes a long time to execute.\n"+
+//            "\n";
+//        prompt1.showMessageDialog(this,msg,"Instructions",JOptionPane.INFORMATION_MESSAGE);
+//        java.io.File file;
+//        javax.swing.JFileChooser fileChooser1 = new JFileChooser(properties.rootPath.getAbsolutePath());
+//        fileChooser1.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//        int returnVal=fileChooser1.showOpenDialog(this);                
+//        if (returnVal == JFileChooser.APPROVE_OPTION) {
+//            file = fileChooser1.getSelectedFile();
+//            //check that selected directory is usable.
+//            if(!file.isDirectory()){
+//                msg="You must select a directory containing simulation files.";
+//                prompt1.showMessageDialog(this,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+//                loadSimDataClicked(evt); //reloads the file chooser.
+//                return;
+//            }
+//            edu.uconn.psy.jtrace.Model.TraceParam tp=new edu.uconn.psy.jtrace.Model.TraceParam();            
+//            edu.uconn.psy.jtrace.IO.WTFileReader FR;
+//            java.io.File dir[]=file.listFiles();                        
+//            if(dir.length==0){ //add more conditions here.
+//                msg="The contents of this folder cannot be used for a regression test.";
+//                prompt1.showMessageDialog(this,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+//                regressionTest(evt); //reloads file chooser.
+//                return;
+//            }
+//            int folders=0;
+//            for(int i=0;i<dir.length;i++)
+//                if(dir[i].isDirectory()) folders++;
+//            String summ="Starting regression test of "+folders+" simulations.\n"+
+//                "(each simulation/comparison may take up to 5 minutes.)\n"+
+//                "List of simulations to compare:\n";
+//            for(int i=0;i<dir.length;i++)
+//                if(dir[i].isDirectory()) summ+="  "+dir[i].getName()+"\n";
+//            prompt1.showMessageDialog(this,summ,"Summary",JOptionPane.INFORMATION_MESSAGE);
+//            task=new edu.uconn.psy.jtrace.IO.simTask(dir,this,7);             
+//            progressBar=new javax.swing.JProgressBar(0,dir.length);
+//            progressBar.setValue(0);
+//            progressFrame=new javax.swing.JFrame("Regression Test");
+//            progressLabel=new javax.swing.JLabel("Working ... ");
+//            progressLabel.setSize(250,75);
+//            progressFrame.getContentPane().setLayout(new javax.swing.BoxLayout(progressFrame.getContentPane(),javax.swing.BoxLayout.Y_AXIS));            
+//            progressFrame.getContentPane().add(progressBar);        
+//            progressFrame.getContentPane().add(progressLabel);
+//            progressBar.setStringPainted(true);
+//            progressBar.setVisible(true);        
+//            progressBar.setSize(250,150);
+//            progressFrame.setSize(250,150);
+//            progressFrame.setLocation(400,400);       
+//            progressFrame.pack();
+//            progressFrame.setVisible(true);            
+//            progressTimer = new javax.swing.Timer(150, new java.awt.event.ActionListener(){
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    updateProgressBar();    
+//                }            
+//            });
+//            task.start();          
+//            progressTimer.start();                                                                
+//        }        
+    }
+    //Load SIM data button
+    private void loadSimDataClicked(java.awt.event.MouseEvent evt) {                
+//        javax.swing.JOptionPane prompt1=new javax.swing.JOptionPane("...",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_OPTION);
+//        String msg="Use this feature to load simulations previously generated by jTrace or Trace.\n"+
+//            "Select a directory containing XML simulation files and click 'choose'.\n"+
+//            "IMPORTANT: never save other files into simulation folders.\n";
+//        prompt1.showMessageDialog(this,msg,"Instructions",JOptionPane.INFORMATION_MESSAGE);
+//        java.io.File file;
+//        javax.swing.JFileChooser fileChooser1 = new JFileChooser(properties.rootPath.getAbsolutePath());
+//        fileChooser1.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//        int returnVal=fileChooser1.showOpenDialog(this);                
+//        if (returnVal == JFileChooser.APPROVE_OPTION) {
+//            file = fileChooser1.getSelectedFile();
+//            //check that selected directory is usable.
+//            if(!file.isDirectory()){
+//                msg="You must select a directory containing simulation files.";
+//                prompt1.showMessageDialog(this,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+//                loadSimDataClicked(evt); //reloads the file chooser.
+//                return;
+//            }
+//            edu.uconn.psy.jtrace.Model.TraceParam tp=new edu.uconn.psy.jtrace.Model.TraceParam();
+//            
+//            edu.uconn.psy.jtrace.IO.WTFileReader FR;
+//            java.io.File dir[]=file.listFiles();                        
+//            if(dir.length==0){ //add more conditions here.
+//                msg="The contents of this folder do not appear to be simulation data.";
+//                prompt1.showMessageDialog(this,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+//                loadSimDataClicked(evt); //reloads the file chooser.
+//                return;
+//            }
+//            //search for a file that would have to be there:
+//            for(int i=0;i<dir.length;i++){
+//                if(dir[i].getName().endsWith("000.xml")) break;
+//                if(i==dir.length-1){
+//                    msg="The contents of this folder do not appear to be simulation data.";
+//                    prompt1.showMessageDialog(this,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+//                    loadSimDataClicked(evt); //reloads the file chooser.
+//                    return;
+//                }
+//            }
+//            task=new edu.uconn.psy.jtrace.IO.simTask(file,this,5);             
+//            progressBar=new javax.swing.JProgressBar(0,dir.length);
+//            progressBar.setValue(0);
+//            progressFrame=new javax.swing.JFrame("loading ...");
+//            progressFrame.getContentPane().add(progressBar);        
+//            progressBar.setStringPainted(true);
+//            progressBar.setVisible(true);        
+//            progressBar.setSize(250,150);
+//            progressFrame.setSize(250,150);
+//            progressFrame.setLocation(400,400);       
+//            progressFrame.pack();
+//            progressFrame.setVisible(true);            
+//            progressTimer = new javax.swing.Timer(150, new java.awt.event.ActionListener(){
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    updateProgressBar();    
+//                }            
+//            });
+//            task.start();            
+//            progressTimer.start();                                                    
+//        }    
+    }
+}
+
+
+ 

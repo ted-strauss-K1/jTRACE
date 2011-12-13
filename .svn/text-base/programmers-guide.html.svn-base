@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <title>Programmer's Guide to jTRACE</title>
+  </head>
+  <body>
+  <h1>Programmer's Guide to jTRACE</h1>
+  <h2>$Date$<br>by Harlan Harris and Ted Strauss</h2>
+  
+  <h2>Introduction</h2>
+  
+   <p>This document provides an introduction to the jTRACE implementation, for
+   development, maintenance, and extension. 
+    <UL>
+      <LI>The <A Name="intro">Introduction</A> gives a high-level summary of the design.</LI>
+      <LI>the <A Name="build">Build Instructions</A> describe how to build jTRACE from source,</LI>
+      <LI>the <A NAME="">GUI Design</A> section describes how the GUI is put together,</LI>
+    </UL>
+    
+      
+   and the Files and Scripts section overviews how the XML schemas are used to 
+   define file formats and scripts.  The jTRACE javadoc are generated from the
+   code; javadoc gives full class specs, including variable and method 
+   declarations.</p>
+  
+   <p>jTRACE is a Java 1.4.2 application with a GUI front-end and a XML-based
+   file structure. </p>
+  
+  <h2>Build Instructions</h2>
+  
+   <h3>Install Netbeans and Java</h3>
+   <p>jTRACE was developed in Netbeans 4.0, using version 1.4.2 of Java. It
+   should be possible to build the application with any 4.X version of Netbeans
+   and with Java 2 SDK 5.X. Sun has 
+   <a href="http://java.sun.com/j2se/1.5.0/download.jsp">a combined package 
+   available for download:</a>. 
+   Follow the usual installation instructions. Note that the Netbeans source
+   assumes that you're using J2SE 1.4.2, and you'll have to make a small
+   change before you can use this more recent version of Java to build. See 
+   below.</p>
+
+   <h3>Install Subversion (optional)</h3>
+   <p>
+   To access our source tree, you'll need to install 
+   <a href="http://subversion.tigris.org/">Subversion</a>. We're using a
+   1.0 build of the subversion server, but you can probably use the most 
+   recent client. On Mac OS X, try <a href="http://codingmonkeys.de/mbo/">
+   this version</a>.</p>
+   <p>
+   You'll also need to install the Subversion plugin for Netbeans,
+   <a href="http://vcsgeneric.netbeans.org/profiles/">here</a>.</p>
+   <p>Ask the authors how/where the SVN server with the jTRACE source is.</p>
+   <p>Alternatively, you can just download a copy of the source from the
+   jTRACE web page, and ignore SVN entirely.</p>
+
+   <h3>Confirm Java version</h3>
+   <p>OK, you've now got a big source tree, and you're ready to use it with
+   Netbeans. First step is to change the Java package information in jTRACE.
+   Right-click on jTRACE in the projects or file window, then select Properties,
+   then General, then change the Java Platform to Default Platform. (Or,
+   if you've got J2SE 1.4.2 installed, you can create a new platform called
+   J2SE142 and use everything as-is.)
+
+   <h3>Set up libraries</h3>
+   <p>
+   jTRACE... Properties... Compiling sources... From there, you'll need to 
+   create several new libraries by selecting .jar files from the libs directory.
+   As follows:</p>
+   <ul>
+   <li>JAXB
+    <ul>
+	<li>lib/jaxb-impl.jar
+	<li>lib/jaxb-api.jar
+	<li>lib/jaxb-libs.jar
+	<li>lib/jaxb-xjc.jar
+	<li>lib/jaxp-api.jar
+	<li>lib/endorsed/dom.jar
+	<li>lib/endorsed/sax.jar
+	<li>lib/endorsed/xalan.jar
+	<li>lib/endorsed/xercesImpl.jar
+	<li>lib/jax-qname.jar
+	<li>lib/namespace.jar
+	<li>lib/relaxngDatatype.jar
+	<li>lib/xsdlib.jar
+	</ul>
+   <li>JaxFront
+    <ul>
+	<li>lib/castor-0.9.5.3-xml.jar
+	<li>lib/commons-beanutils.jar
+	<li>lib/commons-collections.jar
+	<li>lib/commons-httpclient-2.0.1.jar
+	<li>lib/commons-logging.jar
+	<li>lib/jaxfront-core.jar
+	<li>lib/jaxfront-dbm.jar
+	<li>lib/jaxfront-swing.jar
+	<li>lib/jaxfront-xuieditor.jar
+	<li>lib/jgoodiesLF.jar
+	<li>lib/jimi.jar
+	<li>lib/log4j.jar
+	</ul>
+   <li>JFreeChart
+    <ul>
+	<li>lib/gnujaxp.jar
+	<li>lib/jcommon-1.0.0-pre2.jar
+	<li>lib/jfreechart-1.0.0-pre2.jar
+	<li>lib/junit.jar
+	<li>lib/servlet.jar
+	</ul>
+   </ul>
+
+   <h3>Builds</h3>
+   <p>
+   At this point the project should build correctly! To run from within
+   Netbeans, just hit Run. You can also make "official" builds and source
+   packages by using the package/makepackage and makesrczip scripts.
+   </p>
+  
+  <h2>Object Design</h2>
+  
+   <p><b>The following objects are in the Model directory:</b></p>
+   
+   <h3>TracePhones</h3>
+   
+    <p>The TracePhones class defines a number of static methods used to validate
+    phonetic strings and TraceWords, to calculate phoneme representations in the
+    input layer of the model, and to define phoneme continua.</p>
+    
+    <dl>
+    <dt>@@@ methodName</dt>
+    <dd>A brief text description</dd>
+    </dl>
+   
+   <h3>TraceWord</h3>
+   
+    <p>A TraceWord is a tuple of phonetic form, frequency, and familiarity (which
+    is not currently used).</p>
+    
+   <h3>TraceLexicon</h3>
+ 
+    <p>A TraceLexicon is a simple class that maintains a set of TraceWords.
+    It's currently implemented as just an array.</p>
+  
+   <h3>TraceParam</h3>
+   
+    <p>The parameters of a TRACE simulation are specified in a TraceParam object.
+    These parameters include a TraceLexicon, an input string, and the numerous
+    numeric parameters of the model.</p>
+   
+   <h3>TraceNet</h3>
+    
+    <p>A TraceNet is the core of the model itself. </p>
+   
+   <h3>TraceSim</h3>
+   
+    <p>A TraceSim is a wrapper around a TraceNet object. It stores the internal
+    states of a TraceNet at each time step, for real-time display and for
+    later analysis.</p>
+   
+   <h3>TraceSimAnalysis</h3>
+   
+    <p>A TraceSimAnalysis does LCR calculations based on a TraceSim object.</p>
+    
+   <h3>TraceGraph</h3>
+   
+    <p>A TraceGraph is a wrapper around (subclass of?) TraceSimAnalysis that also includes
+    graph visualization preferences.</p>
+   
+   <h3>TraceScript</h3>
+   
+    <p>A TraceScript is an object that can iterate over parameters, create and
+    run TraceSim objects, create derivative TraceGraph objects, export data to
+    files, etc. It is described in more detail in the Files and Scripts section 
+    below.</p>
+   
+   <p><b>The following objects are in the UI directory:</b></p>
+   
+   <h3>jTRACEMDI</h3>
+   
+   <h3>jTRACE</h3>
+   
+   <h3>ParametersPanel</h3>
+   
+   <h3>SimPanel</h3>
+   
+   <h3>GraphPanel</h3>
+   
+   <h3>ScriptFrame</h3>
+   
+   <h3>ScriptPanel</h3>
+   
+   <h3>DataPlot</h3>
+   
+   <h3>InputDataPlot</h3>
+   
+   <h3>FeatureDataPlot</h3>
+   
+   <h3>PhonemeDataPlot</h3>
+   
+   <h3>PhonemeBoxDataPlot</h3>
+   
+   <h3>WordDataPlot</h3>
+   
+   <h3>WordBoxDataPlot</h3>
+   
+   <p><b>The following objects are in the IO directory:</b></p>
+   
+   @@@
+   
+  
+  <h2>GUI Design</h2>
+  
+   <p>jTRACE uses a multiple-document-interface (MDI) approach. Documents are
+   views of linked TraceSim, TraceParam, and TraceGraph objects. The TraceSim and
+   TraceParam objects may be saved or loaded (see below) as .jt files. Each
+   subwindow contains one tab for each of these objects.</p>
+   
+   <p>The scripting window (there can only be one) is separate from jTRACE 
+   document windows. It is a view of a TraceScript object. There are tabs for
+   the associated TraceParam object, for the main TraceScript object, and for
+   a TraceGraph object that plots the compiled results. Additionally, the
+   TraceScript object can request that the scripting window create new jTRACE
+   documents (as above) from individual runs of the script.</p>
+  
+  <h2>Files and Scripts</h2>
+  
+  </body>
+</html>

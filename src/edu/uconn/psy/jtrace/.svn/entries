@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="209"
+   name=""
+   committed-date="2005-08-22T20:25:55.413954Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu/uconn/psy/jtrace"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="209"/>
+<entry
+   name="Model"
+   kind="dir"/>
+<entry
+   committed-rev="212"
+   name="jTRACESchema.xsd"
+   text-time="2005-09-04T15:47:20.000000Z"
+   committed-date="2005-09-04T16:18:09.555688Z"
+   checksum="433cf7ae4b79f087c214e22990283fac"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-03-25T22:17:09.000000Z"
+   revision="212"/>
+<entry
+   name="IO"
+   kind="dir"/>
+<entry
+   name="UI"
+   kind="dir"/>
+</wc-entries>

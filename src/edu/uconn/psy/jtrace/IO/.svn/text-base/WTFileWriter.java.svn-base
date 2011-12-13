@@ -1,0 +1,697 @@
+/*
+ * FileBuilder.java
+ *
+ * Created on May 6, 2004, 4:19 PM
+ */
+
+
+package edu.uconn.psy.jtrace.IO;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.io.*;
+import java.util.*;
+import edu.uconn.psy.jtrace.parser.*;
+
+/**
+ *
+ * @author  tedstrauss
+ */
+public class WTFileWriter {
+    File path;
+    File theFile;
+    String name;
+    BufferedOutputStream bos;
+        
+    public WTFileWriter(File _p,String _n, boolean append){
+        path=_p;
+        if(!path.exists()) path.mkdirs();
+        name=_n;
+        try{
+            theFile=new File(path,name);
+            if(!theFile.exists()) theFile.createNewFile();                
+            bos=new BufferedOutputStream(new FileOutputStream(theFile, append));                            
+        }
+        catch( IOException ioe ) {ioe.printStackTrace(); }
+        catch( Exception e ) {e.printStackTrace(); }
+    }
+    public WTFileWriter(File _f, boolean append){
+        try{
+            theFile=_f;
+            if(!theFile.getParentFile().exists()) theFile.getParentFile().mkdirs();
+            if(!theFile.exists()) theFile.createNewFile();                
+            bos=new BufferedOutputStream(new FileOutputStream(theFile,append));                            
+        }
+        catch( IOException ioe ) {ioe.printStackTrace(); }
+        catch( Exception e ) {e.printStackTrace(); }
+    }
+    
+    /*public String makeJT(com.fg.xmleditor.FXDocumentModelImpl rw){
+       rw.getDocument();
+       //System.out.println(jtrecurse(rw.getDocument()));
+       return jtrecurse(rw.getDocument());
+    }*/
+    public String jtrecurse(org.w3c.dom.Node node){
+        String result="";
+        //open
+        if(node.getNodeType() == node.TEXT_NODE){ 
+            //result+="<"+node.getNodeName()+">\n"
+        }
+        else if(node.getNodeType() == node.ELEMENT_NODE){
+            //result+="<"+node.getNodeName();
+            result+="<"+node.getLocalName();
+            if(node.getLocalName().equals("jt")){
+                result+=" xmlns=\'http://xml.netbeans.org/examples/targetNS\'";
+                result+="\nxmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'";
+                result+="\nxsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/jTRACESchema.xsd\'";                
+            }
+            result+=">";
+        }
+        else if(node.getNodeType() == node.DOCUMENT_NODE){
+            result+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+            
+        }
+        //value and close
+        if(node.getNodeType() == node.TEXT_NODE){
+            result+=node.getNodeValue(); 
+        }
+        else if(node.getNodeType() == node.ELEMENT_NODE || node.getNodeType() == node.DOCUMENT_NODE){
+            for(int i=0;i<node.getChildNodes().getLength();i++)
+                result+=jtrecurse(node.getChildNodes().item(i));        
+            //((org.w3c.dom.Element)node.getChildNodes().item(i)).getTagName();                   
+        }            
+        if(node.getNodeType() == node.ELEMENT_NODE)
+            result+="</"+node.getLocalName()+">";
+        else if(node.getNodeType() == node.DOCUMENT_NODE){            
+        }
+        return result;
+    }
+    public String makeFileHeader(){
+        String result="";
+        result+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<WebTraceData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/jTRACESchema.xsd\'>"+
+                 "\n";                
+        return result;
+    }
+    public String makeFileTail(){
+        String result="";            
+        try{
+            //CLOSE TOP=LEVEL TAG
+            result+="\n</WebTraceData>";
+        }
+        catch( Exception e ) {e.printStackTrace(); return "Exception";}    
+        return result;        
+    }
+    public String makeFileRemarks(edu.uconn.psy.jtrace.Model.TraceParam param){
+        String result="";
+            
+        try{
+            //Top level tag
+            result+="\n<!--\n\tDocument   :"+
+                //"\n\tFile       : "+param.getFilePath()+param.getSaveName()+
+                "\n\tCreated on : "+param.getDateTime()+
+                "\n\tAuthor     : "+param.getUser()+
+                "\n\tDescription: "+param.getComment()+
+                "\n-->";        
+        }
+        catch( Exception e ) {e.printStackTrace(); return "Exception";}    
+        return result;
+    }
+    public String makeWTParameterOpeningTag(){
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<WTParameters xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n";
+        
+    }
+    public String makeWTParameterClosingTag(){
+        return "\n</WTParameters>";        
+    }
+    public String makeWTDataDumpOpeningTag(){
+        return "\n\n<WTSimulationData>";                        
+    }       
+    public String makeWTDataDumpClosingTag(){
+        String result="";
+        result+="\n</WTSimulationData>\n";       
+        return result;
+    }
+    
+    public String makeWTParameterFileBody(edu.uconn.psy.jtrace.Model.TraceParam param){
+          String result="";            
+        try{
+            //build up the XML with strings.
+            //add xml tags using param information.
+            result+="\n\t<DecimalParam><name>aLPHA[if]</name><DecimalValue>"+param.getAlpha().IF+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>aLPHA[fp]</name><DecimalValue>"+param.getAlpha().FP+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>aLPHA[pw]</name><DecimalValue>"+param.getAlpha().PW+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>aLPHA[pf]</name><DecimalValue>"+param.getAlpha().PF+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>aLPHA[wp]</name><DecimalValue>"+param.getAlpha().WP+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>DECAY[f]</name><DecimalValue>"+param.getDecay().F+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>DECAY[p]</name><DecimalValue>"+param.getDecay().P+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>DECAY[w]</name><DecimalValue>"+param.getDecay().W+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>GAMMA[f]</name><DecimalValue>"+param.getGamma().F+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>GAMMA[p]</name><DecimalValue>"+param.getGamma().P+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>GAMMA[w]</name><DecimalValue>"+param.getGamma().W+"</DecimalValue></DecimalParam>";             
+            result+="\n\t<DecimalParam><name>min</name><DecimalValue>"+param.getMin()+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>max</name><DecimalValue>"+param.getMax()+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>REST[f]</name><DecimalValue>"+param.getRest().F+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>REST[p]</name><DecimalValue>"+param.getRest().P+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>REST[w]</name><DecimalValue>"+param.getRest().W+"</DecimalValue></DecimalParam>";
+            result+="\n\t<DecimalParam><name>noiseSD</name><DecimalValue>"+param.getNoiseSD()+"</DecimalValue></DecimalParam>";            
+            result+="\n\t<DecimalParam><name>ModelStochasticity</name><DecimalValue>"+param.getStochasticitySD()+"</DecimalValue></DecimalParam>";
+            
+            result+="\n\t<DecimalParam><name>resting_frq_effect</name><DecimalValue>"+param.getFreqNode().RDL_rest_s+"</DecimalValue></DecimalParam>";            
+            result+="\n\t<DecimalParam><name>weight_frq_effect</name><DecimalValue>"+param.getFreqNode().RDL_wt_s+"</DecimalValue></DecimalParam>";            
+            result+="\n\t<DecimalParam><name>post_frq_effect</name><DecimalValue>"+param.getFreqNode().RDL_post_c+"</DecimalValue></DecimalParam>";            
+            
+            result+="\n\t<IntParam><name>fSlices</name><IntValue>"+param.getFSlices()+"</IntValue></IntParam>";
+            result+="\n\t<IntParam><name>deltaSlices</name><IntValue>"+param.getDeltaInput()+"</IntValue></IntParam>";            
+            result+="\n\t<IntParam><name>nwords</name><IntValue>"+param.getNWords()+"</IntValue></IntParam>";
+            result+="\n\t<IntParam><name>nreps</name><IntValue>"+param.getNReps()+"</IntValue></IntParam>";
+            result+="\n\t<IntParam><name>slicesPerPhon</name><IntValue>"+param.getSlicesPerPhon()+"</IntValue></IntParam>";
+            //result+="\n\t<IntParam><name>slicesPerPhonDetector</name><IntValue>"+param.getSlicesPerPhonDetector()+"</IntValue></IntParam>";
+            
+            result+="\n\t<StringParam><name>modelInput</name><StringValue>"+param.getModelInput()+"</StringValue></StringParam>";
+            
+            
+            //result+="\n\t<StringParamRep><name>"+"Dictionary"+"</name>";
+            //if(param.getDictionary()!=null){
+            //    for(int i=0;i<param.getDictionary().size();i++)
+            //       result+="\n\t\t<StringValue>"+param.getDictionary().get(i).getPhon()+"</StringValue>";                
+            //}
+            //result+="\n\t</StringParamRep>";
+            
+            result+="\n\n<lexicon xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n";
+            if(param.getDictionary()!=null){
+                for(int i=0;i<param.getDictionary().size();i++)
+                    result+="\n\t<lexeme><phons>"+param.getDictionary().get(i).getPhon()+"</phons><freq>"+param.getDictionary().get(i).getFrequency()+"</freq></lexeme>";                
+            }
+            result+="\n</lexicon>";
+            
+            result+="\n\t<IntParamRep><name>"+"FETSPREAD"+"</name>";
+            for(int i=0;i<param.getSpread().length;i++)
+                result+="<IntValue>"+param.getSpread()[i]+"</IntValue>";
+            result+="</IntParamRep>";
+            
+            result+="\n\t<DecimalParamRep><name>"+"spreadScale"+"</name>";
+            for(int i=0;i<param.getSpreadScale().length;i++)
+                result+="\n\t\t<DecimalValue>"+param.getSpreadScale()[i]+"</DecimalValue>";
+            result+="</DecimalParamRep>";
+            
+            //result+="\n\t<DecimalParamRep><name>"+"REST"+"</name>";
+            //for(int i=0;i<param.getRest().length;i++)
+            //    result+="<DecimalValue>"+param.getRest()[i]+"</DecimalValue>";
+            //result+="</DecimalParamRep>";
+            
+            result+="\n\t<StringParam><name>continuumSpec</name><StringValue>"+param.getContinuumSpec()+"</StringValue></StringParam>";
+            result+="\n\t<StringParam><name>user</name><StringValue>"+param.getUser()+"</StringValue></StringParam>";
+            result+="\n\t<StringParam><name>dateTime</name><StringValue>"+param.getDateTime()+"</StringValue></StringParam>";
+            result+="\n\t<StringParam><name>comment</name><StringValue>"+param.getComment()+"</StringValue></StringParam>";            
+                        
+            
+        }
+        catch( Exception e ) {e.printStackTrace(); return "Exception";}
+    
+        return result;
+    }
+    public String makeWTParameterFileBodyTXT(edu.uconn.psy.jtrace.Model.TraceParam param){
+          String result="";            
+        try{
+            //build up the XML with strings.
+            //add xml tags using param information.
+            result+="\naLPHA[if]\t"+param.getAlpha().IF;
+            result+="\naLPHA[fp]\t"+param.getAlpha().FP;
+            result+="\naLPHA[pw]\t"+param.getAlpha().PW;
+            result+="\naLPHA[pf]\t"+param.getAlpha().PF;
+            result+="\naLPHA[wp]\t"+param.getAlpha().WP;
+            result+="\nDECAY[f]\t"+param.getDecay().F;
+            result+="\nDECAY[p]\t"+param.getDecay().P;
+            result+="\nDECAY[w]\t"+param.getDecay().W;
+            result+="\nGAMMA[f]\t"+param.getGamma().F;
+            result+="\nGAMMA[p]\t"+param.getGamma().P;
+            result+="\nGAMMA[w]\t"+param.getGamma().W;
+            result+="\nmin\t"+param.getMin();
+            result+="\nmax\t"+param.getMax();
+            result+="\nREST[f]\t"+param.getRest().F;
+            result+="\nREST[p]"+param.getRest().P;
+            result+="\nREST[w]"+param.getRest().W;
+            result+="\nnoiseSD"+param.getNoiseSD();
+            result+="\nModelStochasticity"+param.getStochasticitySD();
+            result+="\nresting_frq_effect"+param.getFreqNode().RDL_rest_s;
+            result+="\nweight_frq_effect"+param.getFreqNode().RDL_wt_s;
+            result+="\npost_frq_effect"+param.getFreqNode().RDL_post_c;
+            result+="\nfSlices"+param.getFSlices();
+            result+="\ndeltaSlices"+param.getDeltaInput();
+            result+="\nnwords"+param.getNWords();
+            result+="\nnreps"+param.getNReps();
+            result+="\nslicesPerPhon"+param.getSlicesPerPhon();
+            result+="\nmodelInput"+param.getModelInput();
+            result+="\n"+"FETSPREAD\t";
+            for(int i=0;i<param.getSpread().length;i++)
+                result+=param.getSpread()[i]+"\t";
+            result+="\nspreadScale\t";
+            for(int i=0;i<param.getSpreadScale().length;i++)
+                result+=param.getSpreadScale()[i]+"\t";
+            result+="\ncontinuumSpec\t"+param.getContinuumSpec();
+            result+="\nuser\t"+param.getUser();
+            result+="\ndateTime\t"+param.getDateTime();
+            result+="\ncomment\t"+param.getComment();
+            result+="\nlexicon";
+            if(param.getDictionary()!=null){
+                for(int i=0;i<param.getDictionary().size();i++)
+                    result+="\n\t"+param.getDictionary().get(i).getPhon()+"\t"+param.getDictionary().get(i).getFrequency()+"\t";                
+            }            
+        }
+        catch( Exception e ) {e.printStackTrace(); return "Exception";}
+        return result;
+    }
+    public void writeOneDataSlice(double[][] in,double[][] ft,double[][] ph,String[] pLabels, double[][] wd, String[] wLabels,int iter){        
+        /*if(theFile!=null||theFile.exists()){
+            theFile.delete();
+            theFile=null;    
+        }*/
+        /*theFile=null;
+        String idx;
+        if(iter<10) idx=("00"+(new Integer(iter)).toString());
+        else if(iter>=10&&iter<100) idx=("0"+(new Integer(iter)).toString());
+        else idx=((new Integer(iter)).toString());
+        //System.out.print("writing slice "+idx+" I ");        
+        
+        //write feature slice data!
+        try{
+            theFile=new File(path,"input_"+idx+".xml");
+            if(!path.exists()) theFile.mkdirs();
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<inputData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n");    
+        for(int i=0;i<in.length;i++){
+            write("\n\t\t\t<row>");
+            for(int j=0;j<in[0].length;j++)
+                write("<a>"+((new Double(in[i][j])).toString())+"</a>");
+            write("</row>");
+        }
+        writeAndClose("\n\t\t</inputData>");            
+        theFile=null;
+                
+        //write feature slice data!
+        //System.out.print(" F ");
+        try{
+            theFile=new File(path,"feat_"+idx+".xml");
+            if(!path.exists()) theFile.mkdirs();
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<featureData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n");    
+        for(int i=0;i<ft.length;i++){
+            write("\n\t\t\t<row>");
+            for(int j=0;j<ft[0].length;j++)
+                write("<a>"+((new Double(ft[i][j])).toString())+"</a>");
+            write("</row>");
+        }
+        writeAndClose("\n\t\t</featureData>");            
+        theFile=null;
+        
+        //write phoneme slice data!        
+        //System.out.print(" P ");
+        try{
+            theFile=new File(path,"phon_"+idx+".xml");
+            if(!path.exists()) theFile.mkdirs();
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<phonemeData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n");
+        for(int i=0;i<ph.length;i++){
+            write("\n\t\t\t<row>");
+            write("<phon>"+pLabels[i]+"</phon>");
+            for(int j=0;j<ph[0].length;j++)
+                write("<a>"+((new Double(ph[i][j])).toString())+"</a>");
+        }
+        writeAndClose("\n\t\t</phonemeData>");    
+        theFile=null;
+                
+        //write word slice data!
+        //System.out.print(" W ");
+        try{
+            theFile=new File(path,"word_"+idx+".xml");
+            if(!path.exists()) theFile.mkdirs();
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<wordData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n");    
+        for(int i=0;i<wd.length;i++){
+            write("\n\t\t\t<row>");
+            write("<word>"+wLabels[i]+"</word>");
+            for(int j=0;j<wd[0].length;j++)
+                write("<a>"+((new Double(wd[i][j])).toString())+"</a>");
+            write("</row>");
+        }
+        writeAndClose("\n\t\t</wordData>");            
+        theFile=null;
+        //System.out.print(" . \n");        
+         **/
+    }
+    public void writeOneRawSlice(double[][] in,double[][] ft,double[][] ph,String[] pLabels, double[][] wd, String[] wLabels,int iter){        
+        /*if(theFile!=null||theFile.exists()){
+            theFile.delete();
+            theFile=null;    
+        }*/
+        theFile=null;        
+        String idx;
+        if(iter<10) idx=("00"+(new Integer(iter)).toString());
+        else if(iter>=10&&iter<100) idx=("0"+(new Integer(iter)).toString());
+        else idx=((new Integer(iter)).toString());
+        
+        //System.out.print("writing slice "+idx+" I ");        
+        
+        //write feature slice data!
+        try{
+            theFile=new File(path,"input_"+idx+".txt");
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("\n-"+path.getName()+"-\n\n");
+        for(int i=0;i<in.length;i++){
+            write("\n");
+            for(int j=0;j<in[0].length;j++)
+                write(((new Double(in[i][j])).toString().substring(0,3))+"  ");
+            
+        }                    
+        writeAndClose("\n");
+        theFile=null;
+                
+        //write feature slice data!
+        //System.out.print(" F ");
+        try{
+            theFile=new File(path,"feat_"+idx+".txt");
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("\n-"+path.getName()+"-\n\n");
+        for(int i=0;i<ft.length;i++){
+            write("\n");
+            for(int j=0;j<ft[0].length;j++)
+                write(((new Double(ft[i][j])).toString())+"  ");            
+        }                    
+        writeAndClose("\n");
+        theFile=null;
+        
+        //write phoneme slice data!        
+        //System.out.print(" P ");
+        try{
+            theFile=new File(path,"phon_"+idx+".txt");
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("\n-"+path.getName()+"-\n\n");
+        for(int i=0;i<ph.length;i++){
+            write("\n"+pLabels[i]+"  ");
+            for(int j=0;j<ph[0].length;j++)
+                write(((new Double(ph[i][j])).toString())+"  ");            
+        }
+        writeAndClose("\n");    
+        theFile=null;
+                
+        //write word slice data!
+        //System.out.print(" W ");
+        try{
+            theFile=new File(path,"word_"+idx+".txt");
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }        
+        write("\n-"+path.getName()+"-\n\n");            
+        for(int i=0;i<wd.length;i++){
+            write("\n"+wLabels[i]+"  ");
+            for(int j=0;j<wd[0].length;j++)
+                write(((new Double(wd[i][j])).toString())+"  ");                        
+        }
+        writeAndClose("\n");
+        theFile=null;
+        //System.out.print(" . \n");        
+    }
+    public void write(String contents){
+        try{
+            bos.write(contents.getBytes());            
+        }
+        catch( IOException ioe ) {ioe.printStackTrace(); }        
+    }
+    public void writeAndClose(String contents){
+        try{
+            bos.write(contents.getBytes());
+            bos.close();
+            bos=null;    
+            //System.out.println("closed file writer.");            
+        }
+        catch( IOException ioe ) {ioe.printStackTrace(); }
+        catch( Exception e ) {e.printStackTrace(); }
+    }
+    
+    public void writeErrorGraphDataFile(double[][] data,int spread,String in,String report){
+        String contents="";
+        try{
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }   
+        contents+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<graphData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n";
+        contents+="\t<title>"+"Sim Comparison Error Graph"+"</title>\n";
+        contents+="\t<report>"+report+"</report>\n";
+        contents+="\t<modelInput>"+in+"</modelInput>\n";
+        contents+="\t<spread>"+spread+"</spread>\n";
+        contents+="\t<fromLeft>"+1+"</fromLeft>\n";
+        contents+="\t<toRight>"+(data[0].length-1)+"</toRight>\n";
+        contents+="\t<labels>";
+            contents+="\t\t<label>"+"Input layer"+"</label>\n";
+            contents+="\t\t<label>"+"Feature layer"+"</label>\n";
+            contents+="\t\t<label>"+"Phoneme layer"+"</label>\n";
+            contents+="\t\t<label>"+"Word layer"+"</label>\n";
+        contents+="\t</labels>\n";
+        contents+="\t<data>\n";
+        for(int i=0;i<data.length;i++){
+            contents+="\t<row>";
+            if(i==0)
+                contents+="<label>"+"Input layer"+"</label>\n";
+            else if(i==1)
+                contents+="<label>"+"Feature layer"+"</label>\n";
+            else if(i==2)
+                contents+="<label>"+"Phoneme layer"+"</label>\n";
+            else if(i==3)
+                contents+="<label>"+"Word layer"+"</label>\n";
+            for(int j=0;j<data[0].length;j++)                
+                contents+="<d>"+data[i][j]+"</d>";
+            contents+="</row>\n";
+        }
+        contents+="\t</data>\n";
+        contents+="</graphData>\n";
+        writeAndClose(contents);
+    }
+    public void writePhonemeErrorGraphFile(double[][][] data,int spread,String in,String report){
+        String phonemeLabels[]={"/p/", "/b/", "/t/", "/d/", "/k/", "/g/", "/s/", "/S/", "/r/", "/l/", "/a/", "/i/", "/u/", "/^/", "/-/"};     
+        String contents="";
+        try{
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }   
+        contents+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<graphData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n";
+        contents+="\t<title>"+"Phoneme error comparison"+"</title>\n";
+        contents+="\t<report>"+report+"</report>\n";
+        contents+="\t<modelInput>"+in+"</modelInput>\n";
+        contents+="\t<spread>"+spread+"</spread>\n";
+        contents+="\t<fromLeft>"+1+"</fromLeft>\n";
+        contents+="\t<toRight>"+(data.length-1)+"</toRight>\n";
+        contents+="\t<labels>";
+            for(int i=0;i<phonemeLabels.length;i++)
+            contents+="\t\t<label>"+phonemeLabels[i]+"</label>\n";
+        contents+="\t</labels>\n";
+        contents+="\t<data>\n";
+        double max;
+        for(int j=0;j<data[0].length&&j<phonemeLabels.length;j++){
+            //System.out.print("\nrow, ");                                            
+            contents+="\t<row>";
+            contents+="\t\t<label>"+phonemeLabels[j]+"</label>\n\t\t";
+            //QUESTION : is it correct to implement this part here? in the file writing code?
+            for(int i=0;i<data.length;i++){
+                //System.out.print(i+" ");                                            
+                max=data[i][j][0];
+                for(int k=0;k<data[i][j].length;k++){
+                    if(Math.abs(data[i][j][k])>=Math.abs(max)) max=data[i][j][k];
+                }
+                contents+="<d>"+max+"</d>";              
+            }            
+            contents+="\n\t</row>\n";
+        }
+        contents+="\t</data>\n";
+        contents+="</graphData>\n";
+        writeAndClose(contents);
+    }
+    public void writeWordErrorGraphFile(double[][][] data,int spread,String in,String report,String[] lbl){
+        String wordLabels[]=lbl;     
+        String contents="";
+        try{
+            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+        } catch( IOException ioe ) {ioe.printStackTrace(); }   
+        contents+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+                "\n\n<graphData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACEMDI.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+                 "\n";
+        contents+="\t<title>"+"Word error comparison"+"</title>\n";
+        contents+="\t<report>"+report+"</report>\n";
+        contents+="\t<modelInput>"+in+"</modelInput>\n";
+        contents+="\t<spread>"+spread+"</spread>\n";
+        contents+="\t<fromLeft>"+1+"</fromLeft>\n";
+        contents+="\t<toRight>"+(data.length-1)+"</toRight>\n";
+        contents+="\t<labels>";
+        for(int i=0;i<wordLabels.length;i++){
+            contents+="\t\t<label>"+wordLabels[i]+"</label>\n";
+            //System.out.print(wordLabels[i]+"  ");
+        }
+        contents+="\t</labels>\n";
+        contents+="\t<data>\n";
+        write(contents);
+                System.gc();
+        Runtime.getRuntime().gc();        
+        double max;
+        for(int j=0;j<data[0].length&&j<wordLabels.length;j++){
+            //System.out.println(""+j+" | "+wordLabels[j]);                
+            contents="\t<row>";
+            contents+="\t\t<label>"+wordLabels[j]+"</label>\n\t\t";
+            for(int i=0;i<data.length;i++){
+                //System.out.print(i+" ");                            
+                max=data[i][j][0];
+                for(int k=0;k<data[i][j].length;k++){                    
+                    if(abs(data[i][j][k])>=abs(max)) max=data[i][j][k];                    
+                }
+                contents+="<d>"+max+"</d>";              
+            }   
+            contents+="\n\t</row>\n";
+            write(contents);        
+        }
+        contents+="\t</data>\n";
+        contents+="</graphData>\n";
+        writeAndClose(contents);
+    }
+//    public void writeRawGraphDataFile(edu.uconn.psy.jtrace.UI.LCRGraphViewer gr){
+//        System.gc();
+//        Runtime.getRuntime().gc();
+//        String contents="";
+//        /*try{
+//            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+//        } catch( IOException ioe ) {ioe.printStackTrace(); }   */
+//        //contents+="\n";
+//        //contents+="\t"+gr.getTitle()+"\n";
+//        contents+=gr.getModelInput()+"\t\t";
+//        //contents+="input= "+gr.getModelInput()+"\t";
+//        //contents+="\tspread= "+gr.getDelta()+"\t";
+//        contents+="\t(from slice "+gr.getFromLeft()+"to";
+//        contents+=" "+gr.getToRight()+")\t\n";
+//        //contents+="\tlabels:";
+//        //for(int i=0;i<gr.getLabels().length;i++)
+//        //    contents+="\t"+gr.getLabels()[i]+"\n";            
+//        //contents+="\t\ndata:\n";
+//        //contents+="\t<data>\n";
+//        for(int i=0;i<gr.getData()[0].length;i++){
+//            contents+=""+i+"\t"+gr.getLabels()[i]+"\t";
+//            for(int j=0;j<gr.getData().length;j++){                                
+//                if(gr.getData()[j][i]<0.001d)
+//                    contents+=0.0;
+//                else if((new Double(gr.getData()[j][i])).toString().length()>6)                    
+//                    contents+=(new Double(gr.getData()[j][i])).toString().substring(0,5);
+//                else
+//                    contents+=+gr.getData()[j][i];
+//                contents+="\t";
+//            }
+//            contents+="\n";
+//        }
+//        //contents+="\n\nEOF\n";
+//        writeAndClose(contents);
+//    }
+//    public void writeGraphDataFile(edu.uconn.psy.jtrace.UI.LCRGraphViewer gr){        
+//        System.gc();
+//        Runtime.getRuntime().gc();
+//        String contents="";
+//        try{
+//            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+//        } catch( IOException ioe ) {ioe.printStackTrace(); }   
+//        write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+//                "\n\n<graphData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+//                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+//                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACE.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+//                 "\n");
+//        write("\t<title>"+gr.getTitle()+"</title>\n");
+//        write("\t<modelInput>"+gr.getModelInput()+"</modelInput>\n");
+//        write("\t<spread>"+gr.getDelta()+"</spread>\n");
+//        write("\t<fromLeft>"+gr.getFromLeft()+"</fromLeft>\n");
+//        write("\t<toRight>"+gr.getToRight()+"</toRight>\n");
+//        write("\t<labels>");
+//        for(int i=0;i<gr.getLabels().length;i++)
+//            write("\t\t<label>"+gr.getLabels()[i]+"</label>\n");            
+//        write("\t</labels>\n");
+//        write("\t<data>\n");
+//        for(int i=0;i<gr.getData()[0].length;i++){
+//            write("\t\t<row><label>"+gr.getLabels()[i]+"</label>");
+//            for(int j=0;j<gr.getData().length;j++)                
+//                write("<d>"+gr.getData()[j][i]+"</d>");
+//            write("</row>\n");
+//        }
+//        write("\t</data>\n");
+//        write("</graphData>\n");
+//        writeAndClose("");
+//    }
+//    public void writeGraphDataFile2(edu.uconn.psy.jtrace.UI.LCRGraphViewer gr){        
+//        System.gc();
+//        Runtime.getRuntime().gc();
+//        String contents="";
+//        try{
+//            bos=new BufferedOutputStream(new FileOutputStream(theFile));            
+//        } catch( IOException ioe ) {ioe.printStackTrace(); }   
+//        contents+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+//                "\n\n<graphData xmlns=\'http://xml.netbeans.org/examples/targetNS\'"+
+//                 "\n\t\txmlns:xsi=\'http://www.w3.org/2001/XMLSchema-instance\'"+
+//                 "\n\txsi:schemaLocation=\'http://xml.netbeans.org/examples/targetNS file:"+edu.uconn.psy.jtrace.UI.jTRACE.properties.rootPath.getAbsolutePath()+"/Schema/WebTraceSchema.xsd\'>"+
+//                 "\n";
+//        contents+="\t<title>"+gr.getTitle()+"</title>\n";
+//        contents+="\t<modelInput>"+gr.getModelInput()+"</modelInput>\n";
+//        contents+="\t<spread>"+gr.getDelta()+"</spread>\n";
+//        contents+="\t<fromLeft>"+gr.getFromLeft()+"</fromLeft>\n";
+//        contents+="\t<toRight>"+gr.getToRight()+"</toRight>\n";
+//        contents+="\t<labels>";
+//        for(int i=0;i<gr.getLabels().length;i++)
+//            contents+="\t\t<label>"+gr.getLabels()[i]+"</label>\n";            
+//        contents+="\t</labels>\n";
+//        contents+="\t<data>\n";
+//        for(int i=0;i<gr.getData()[0].length;i++){
+//            contents+="\t\t<row><label>"+gr.getLabels()[i]+"</label>";
+//            for(int j=0;j<gr.getData().length;j++)                
+//                contents+="<d>"+gr.getData()[j][i]+"</d>";
+//            contents+="</row>\n";
+//        }
+//        contents+="\t</data>\n";
+//        contents+="</graphData>\n";
+//        writeAndClose(contents);
+//    }
+    private double abs(double x){
+        if(x>=0) return x;
+        else return -x;
+    }
+}

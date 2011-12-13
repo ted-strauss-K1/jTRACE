@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="152"
+   name=""
+   committed-date="2005-06-13T12:26:05.574900Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/docs/pix"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="152"
+   name="bar-save.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="3816aacf67b65e1c5f784fe760f64afc"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:49.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-load.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="92a9087324b7b0b8572c2fbfda4a3172"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:50.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-expand.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="d1ac1bfc728b2117d16178af19699cf9"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:50.000000Z"/>
+<entry
+   committed-rev="152"
+   name="toolbar.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="d896cebb90bdb1fff872431d85f18204"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:53.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-shift-node.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="01026428f9a1293e02669e31077d47d1"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:53.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-find.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="47462d4da87a00e3475e837209e999d4"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:54.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-remove-node.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="6e04ad6c5c68e5e794b947160118c808"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:54.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-run.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="d1e8b12a5ea2442189e01788e1f26db6"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:57:54.000000Z"/>
+<entry
+   committed-rev="152"
+   name="Workbook3.xls"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="28845b275b8569b355ed0c061a3e1a3e"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:58:01.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-new.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="6055b6cb4caae5b3570edfdf29acc3fb"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:58:01.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-validate.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="5bdaf971784aa48a520919d95d0b6760"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:58:01.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-new-node.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="f7b9c9ff33cf759c644c421f19a8ff2e"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:58:01.000000Z"/>
+<entry
+   committed-rev="152"
+   name="bar-edit-view.jpg"
+   text-time="2005-06-29T05:58:01.000000Z"
+   committed-date="2005-06-13T12:26:05.574900Z"
+   checksum="d0b0dc80b5790c73d5c2042ea887b400"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:58:01.000000Z"/>
+</wc-entries>

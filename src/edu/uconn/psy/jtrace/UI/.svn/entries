@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="209"
+   name=""
+   committed-date="2005-08-22T20:25:55.413954Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu/uconn/psy/jtrace/UI"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="209"/>
+<entry
+   committed-rev="177"
+   name="PhonemeBoxSimGraph.java"
+   text-time="2005-06-30T02:55:16.000000Z"
+   committed-date="2005-06-29T21:24:32.035425Z"
+   checksum="15df411c4186dd93fb67dd0c1999e180"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-30T02:55:15.000000Z"/>
+<entry
+   committed-rev="203"
+   name="jTRACEMDI.java"
+   text-time="2005-08-23T15:05:59.000000Z"
+   committed-date="2005-07-14T16:10:52.665548Z"
+   checksum="2903bcefbe83e3f2f5ed29b9bdb396f5"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-08-23T15:05:59.000000Z"/>
+<entry
+   committed-rev="78"
+   name="MouseOverHintManager.java"
+   text-time="2005-05-17T20:35:11.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="9edc6c060f6e790dcc6141c8e58ef0ca"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-17T20:35:11.000000Z"/>
+<entry
+   committed-rev="212"
+   name="GraphPanel.form"
+   text-time="2005-09-04T15:22:17.000000Z"
+   committed-date="2005-09-04T16:18:09.555688Z"
+   checksum="e9a723ad5cbae5c440ac8ac8eb240b1a"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T02:34:37.000000Z"
+   revision="212"/>
+<entry
+   committed-rev="195"
+   name="HelpFrame.java"
+   text-time="2005-07-08T20:05:35.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="f703e9cc46ddeb47f353789197bda605"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-30T02:55:16.000000Z"/>
+<entry
+   committed-rev="1"
+   name="IntegerEditor.java"
+   text-time="2005-03-25T22:17:12.000000Z"
+   committed-date="2005-03-24T23:19:51.021048Z"
+   checksum="09c73ebfe7e844e9871e475de590cda0"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-03-25T22:17:11.000000Z"/>
+<entry
+   committed-rev="114"
+   name="ParametersPanel.form"
+   text-time="2005-08-19T21:09:35.000000Z"
+   committed-date="2005-06-01T17:44:41.366441Z"
+   checksum="16ef24687139fce3fb067fcc96e3f92f"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-01T19:34:06.000000Z"/>
+<entry
+   committed-rev="60"
+   name="WordSimGraph.java"
+   text-time="2005-05-11T21:53:45.000000Z"
+   committed-date="2005-05-11T21:07:39.872354Z"
+   checksum="3e512e924aea3234548e0fef6d9407af"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-11T21:53:45.000000Z"/>
+<entry
+   committed-rev="60"
+   name="AboutFrame.form"
+   text-time="2005-05-11T21:53:45.000000Z"
+   committed-date="2005-05-11T21:07:39.872354Z"
+   checksum="7f9bf1ff4dcf95a11c61c51f6ccc2c2a"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-11T21:53:45.000000Z"/>
+<entry
+   committed-rev="173"
+   name="jTRACE.java"
+   text-time="2005-06-29T06:30:24.000000Z"
+   committed-date="2005-06-29T06:56:46.354760Z"
+   checksum="10e6acff90ae477b84fc30e8b5bf2830"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T02:34:37.000000Z"/>
+<entry
+   committed-rev="200"
+   name="SimPanel.java"
+   text-time="2005-07-14T15:43:02.000000Z"
+   committed-date="2005-07-14T15:36:51.912321Z"
+   checksum="dfb4cde17c8fd4ef0f3710ce1912aa11"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T15:43:02.000000Z"/>
+<entry
+   committed-rev="201"
+   name="ParameterTableModel.java"
+   text-time="2005-07-14T15:56:00.000000Z"
+   committed-date="2005-07-14T15:46:39.668151Z"
+   checksum="df0381028ebbe07104a77de00f07e676"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T15:56:00.000000Z"/>
+<entry
+   committed-rev="167"
+   name="traceProperties.java"
+   text-time="2005-06-28T12:20:33.000000Z"
+   committed-date="2005-06-21T18:07:54.669316Z"
+   checksum="cee125fc5496babd06f055de40af9010"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-28T12:20:33.000000Z"/>
+<entry
+   committed-rev="201"
+   name="ScriptingFrame.java"
+   text-time="2005-07-14T15:56:00.000000Z"
+   committed-date="2005-07-14T15:46:39.668151Z"
+   checksum="cecd9776d7b42a93c6443188239e99a3"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T15:56:00.000000Z"/>
+<entry
+   committed-rev="193"
+   name="BaseParametersDialog.java"
+   text-time="2005-07-06T18:44:41.000000Z"
+   committed-date="2005-07-06T18:28:08.518960Z"
+   checksum="96708ccf421687b1a6831a30d696cca6"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T18:44:41.000000Z"/>
+<entry
+   committed-rev="177"
+   name="WordBoxSimGraph.java"
+   text-time="2005-06-30T02:55:16.000000Z"
+   committed-date="2005-06-29T21:24:32.035425Z"
+   checksum="07125217b57ac3f9e24868d93280dd1f"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-30T02:55:16.000000Z"/>
+<entry
+   committed-rev="212"
+   name="GraphPanel.java"
+   text-time="2005-09-04T15:22:17.000000Z"
+   committed-date="2005-09-04T16:18:09.555688Z"
+   checksum="0e1c6b899a95e44e36e0fa188f581103"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-08-23T15:05:59.000000Z"
+   revision="212"/>
+<entry
+   committed-rev="210"
+   name="ParametersPanel.java"
+   text-time="2005-08-19T21:09:35.000000Z"
+   committed-date="2005-08-23T15:16:31.866835Z"
+   checksum="b9fadec634e671f0776c7c4fa3121612"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-01T19:34:06.000000Z"
+   revision="210"/>
+<entry
+   committed-rev="170"
+   name="jTRACEMDI.form"
+   text-time="2005-07-06T16:06:08.000000Z"
+   committed-date="2005-06-28T17:12:50.354053Z"
+   checksum="64c47a134942c3f077c9ce8da7178dc9"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T02:34:38.000000Z"/>
+<entry
+   committed-rev="119"
+   name="CommandLineUI.java"
+   text-time="2005-06-01T22:12:53.000000Z"
+   committed-date="2005-06-01T22:16:34.833333Z"
+   checksum="1f19e5e6976bd1522fce352f1508d587"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="198"
+   name="AboutFrame.java"
+   text-time="2005-07-14T13:46:24.000000Z"
+   committed-date="2005-07-13T23:05:38.897863Z"
+   checksum="cb8abf395953b5f62df23852228b813a"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T13:46:24.000000Z"/>
+<entry
+   committed-rev="195"
+   name="GraphParameters.java"
+   text-time="2005-07-12T00:54:35.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="4b5021874488c1647a50e2ea55c6c1e9"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-19T14:33:14.000000Z"/>
+<entry
+   committed-rev="78"
+   name="HelpFrame.form"
+   text-time="2005-07-08T20:05:35.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="fd017babc84892f0f8877e67e371afcb"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-17T20:35:11.000000Z"/>
+<entry
+   committed-rev="60"
+   name="FeatureSimGraph.java"
+   text-time="2005-05-11T21:53:45.000000Z"
+   committed-date="2005-05-11T21:07:39.872354Z"
+   checksum="3e2fb524c88734d9eef548015ae4704d"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-11T21:53:45.000000Z"/>
+<entry
+   committed-rev="60"
+   name="PhonemeSimGraph.java"
+   text-time="2005-05-11T21:53:45.000000Z"
+   committed-date="2005-05-11T21:07:39.872354Z"
+   checksum="1145c6b49b80da5eae7858a41f23e7da"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-11T21:53:45.000000Z"/>
+<entry
+   committed-rev="178"
+   name="WindowMenuList.java"
+   text-time="2005-06-30T02:55:16.000000Z"
+   committed-date="2005-06-30T01:53:12.802481Z"
+   checksum="2f7df09736e7a83da8c79cb9a4f83579"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-30T02:55:16.000000Z"/>
+<entry
+   committed-rev="38"
+   name="LexiconTableModel.java"
+   text-time="2005-05-06T05:14:13.000000Z"
+   committed-date="2005-05-05T00:57:08.410662Z"
+   checksum="bf79c454b34194de25a2b005cffcbbac"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-06T05:14:12.000000Z"/>
+<entry
+   committed-rev="168"
+   name="InputSimGraph.java"
+   text-time="2005-06-27T22:49:57.000000Z"
+   committed-date="2005-06-28T12:20:31.062131Z"
+   checksum="48a18590daddcb052c74a261ddca8d68"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-11T21:53:45.000000Z"/>
+<entry
+   committed-rev="168"
+   name="AbstractSimGraph.java"
+   text-time="2005-06-27T23:04:15.000000Z"
+   committed-date="2005-06-28T12:20:31.062131Z"
+   checksum="4455b4ce76146b66c4f5d2ed7b3b4724"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-14T12:25:34.000000Z"/>
+</wc-entries>

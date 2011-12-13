@@ -1,0 +1,1190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : WTParameterSchema.xsd
+    Created on : May 6, 2004, 2:25 PM
+    Author     : tedstrauss
+    Description:
+        Purpose of XML Schema document follows.
+ -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://xml.netbeans.org/examples/targetNS"
+            xmlns="http://xml.netbeans.org/examples/targetNS"
+            elementFormDefault="qualified">
+            
+            <xsd:element name="jt">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="script">
+                            <xsd:complexType>
+                                <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                                    <xsd:element name="iterate" type="jtIteratorType"/>
+                                    <xsd:element name="condition" type="jtConditionalType"/>
+                                    <xsd:element name="action" type="jtActionType"/>
+                                </xsd:choice>                                
+                            </xsd:complexType>
+                        </xsd:element>                                                
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            
+            <xsd:element name="lexicon" type="jtLexiconType"/>
+            <xsd:element name="parameters" type="jtParametersType"/>
+            <xsd:element name="phonology" type="jtPhonologyType"/>
+            
+            <xsd:complexType name="jtExpressionType">                
+                <xsd:choice>                    
+                    <xsd:element name="iterate" type="jtIteratorType"/>
+                    <xsd:element name="condition" type="jtConditionalType"/>
+                    <xsd:element name="action" type="jtActionType"/>
+                </xsd:choice>                
+            </xsd:complexType>
+                        
+            <xsd:complexType name="jtIteratorType">            
+                <xsd:sequence>
+                    <xsd:choice>                    
+                        <xsd:element name="over-items-in-a-lexicon">
+                            <!-- if arg field is left blank -->
+                            <xsd:complexType>
+                                <xsd:choice>
+                                    <xsd:element name="use-the-current-lexicon">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="target-parameter" type="xsd:string" fixed="modelInput" minOccurs="0"/>                                                                                                                        
+                                                <xsd:element name="randomize-order" type="xsd:boolean" minOccurs="0" default="0"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                    <xsd:element name="use-a-newly-specified-lexicon">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="target-parameter" type="xsd:string" fixed="modelInput" minOccurs="0"/>                                                                        
+                                                <xsd:element name="arg" type="jtLexiconType" minOccurs="0" maxOccurs="1"/>                                
+                                                <xsd:element name="randomize-order" type="xsd:boolean" minOccurs="0" default="0"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>                            
+                                    </xsd:element>
+                                    <xsd:element name="use-a-saved-lexicon">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="target-parameter" type="xsd:string" fixed="modelInput" minOccurs="0"/>                                                                        
+                                                <xsd:element name="file" type="jtFileNameType" />               
+                                                <xsd:element name="randomize-order" type="xsd:boolean" default="0" minOccurs="0"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>                            
+                                    </xsd:element>
+                                </xsd:choice>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="incrementing-value">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="target-parameter" type="jtModifiableParameterLabelsType"/>                                        
+                                    <xsd:element name="type" type="jtPrimitiveLabelsType" />                                        
+                                    <xsd:element name="from" type="xsd:decimal"/>
+                                    <xsd:element name="to" type="xsd:decimal"/>                                    
+                                    <xsd:element name="number-of-steps" type="xsd:int"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="over-phoneme-continuum">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="from" type="jtPhonemeLabelsType"/>                                        
+                                    <xsd:element name="to" type="jtPhonemeLabelsType"/>                                    
+                                    <xsd:element name="number-of-steps">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:int">
+                                                <xsd:minInclusive value="2"/>
+                                                <xsd:maxInclusive value="9"/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="over-eye-tracking-four-tuples">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="four-tuple" minOccurs="1" maxOccurs="unbounded">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="target" type="xsd:string"/>
+                                                <xsd:element name="competitor-one" type="xsd:string"/>                                    
+                                                <xsd:element name="competitor-two" type="xsd:string"/>                                    
+                                                <xsd:element name="competitor-three" type="xsd:string"/>                                    
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="incrementing-multiple-values">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="number-of-steps" type="xsd:int"/>
+                                    <xsd:element name="continua" minOccurs="1" maxOccurs="unbounded">
+                                        <xsd:complexType><xsd:sequence>                                     
+                                            <xsd:element name="target-parameter" type="jtModifiableParameterLabelsType"/>                                        
+                                            <xsd:element name="type" type="jtPrimitiveLabelsType" fixed="decimal"/>                                        
+                                            <xsd:element name="from" type="xsd:decimal"/>
+                                            <xsd:element name="to" type="xsd:decimal"/>                                                                                
+                                        </xsd:sequence></xsd:complexType>
+                                    </xsd:element>                                    
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="just-repeat-the-same-thing">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="tip" type="xsd:string" fixed="loop the same procedures a specified number of times."/>
+                                    <xsd:element name="repetitions">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:int">
+                                                <xsd:minInclusive value="0"/>
+                                                <xsd:maxInclusive value="10000"/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="appending-items-to-the-lexicon">
+                            <!-- if arg field is left blank -->
+                            <xsd:complexType>             
+                                <xsd:sequence>
+                                    <xsd:element name="target-parameter" type="xsd:string" fixed="appendLexicon" minOccurs="0"/>
+                                    <xsd:choice>
+                                        <xsd:element name="a-list-of-words" type="jtLexiconType" minOccurs="0" maxOccurs="1"/>                                
+                                        <xsd:element name="a-lexicon-from-file" type="jtFileNameType" />                                                                                
+                                    </xsd:choice>
+                                    <xsd:element name="append-N-at-time" type="xsd:int"/>                                                                        
+                                    <xsd:element name="duplicate-filter" type="xsd:boolean" default="1"/>                                                                        
+                                    <xsd:element name="randomize-order" type="xsd:boolean" default="0"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="while-predicate-is-true">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="predicate" type="jtPredicateType"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="over-list-of-values">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="target-parameter" type="jtModifiableParameterLabelsType"/>                                        
+                                    <xsd:element name="type" type="jtPrimitiveLabelsType"/>
+                                    <xsd:element name="arg" type="jtPrimitiveType" minOccurs="1" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>                                
+                        </xsd:element>                        
+                    </xsd:choice>
+                    <xsd:element name="instruction" type="jtExpressionType" minOccurs="0" maxOccurs="unbounded"/>                                                                                                                                
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType name="jtConditionalType">
+                <xsd:sequence>
+                    <xsd:element name="if" type="jtPredicateType"/>
+                    <xsd:element name="then" type="jtExpressionType" minOccurs="0" maxOccurs="unbounded"/>
+                    <!--<xsd:element name="else" type="jtExpressionType" minOccurs="0" maxOccurs="unbounded"/>-->
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType name="jtPredicateType">
+                <xsd:choice>
+                    <xsd:element name="equals">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="one" type="jtPrimitiveType"/>
+                            <xsd:element name="two" type="jtPrimitiveType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="not-equal">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="one" type="jtPrimitiveType"/>
+                            <xsd:element name="two" type="jtPrimitiveType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="is-greater-than">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="one" type="jtPrimitiveType"/>
+                            <xsd:element name="two" type="jtPrimitiveType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="is-less-than">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="one" type="jtPrimitiveType"/>
+                            <xsd:element name="two" type="jtPrimitiveType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="is-member-of-list">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="search-item" type="jtPrimitiveType"/>
+                            <xsd:element name="list" type="jtPrimitiveType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="true">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="xsd:string" fixed="n/a"/>                            
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="false">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="xsd:string" fixed="n/a"/>                            
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="and">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="predicate-one" type="jtPredicateType"/>
+                            <xsd:element name="predicate-two" type="jtPredicateType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="or">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="predicate-one" type="jtPredicateType"/>
+                            <xsd:element name="predicate-two" type="jtPredicateType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="not">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="predicate-one" type="jtPredicateType"/>                            
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                </xsd:choice>
+            </xsd:complexType>
+            
+                        
+            <xsd:complexType name="jtPrimitiveType">
+                <xsd:choice>
+                <!-- jt primitive types: text, int, decimal, file, parameter, lexicon, predicate, query -->
+                    <xsd:element name="text" type="xsd:string"/>
+                    <xsd:element name="int" type="xsd:int"/>
+                    <xsd:element name="decimal" type="xsd:decimal"/>
+                    <xsd:element name="file" type="jtFileNameType"/>                    
+                    <xsd:element name="parameters" type="jtParametersType" />
+                    <xsd:element name="lexicon" type="jtLexiconType" />
+                    <xsd:element name="predicate" type="jtPredicateType" />
+                    <xsd:element name="query" type="jtQueryType" />
+                    <xsd:element name="list" type="jtListOfPrimitivesType"/>                    
+                </xsd:choice>                    
+            </xsd:complexType>
+            
+            <xsd:complexType name="jtTextOrQueryType">
+                <xsd:choice>                
+                    <xsd:element name="text" type="xsd:string"/>
+                    <xsd:element name="query" type="jtQueryType" />                    
+                </xsd:choice>                    
+            </xsd:complexType>
+            
+            <xsd:simpleType name="jtPrimitiveLabelsType">
+                <xsd:restriction base="xsd:string" >
+                <!-- jt primitive types: text, int, decimal, file, parameter, lexicon, predicate, query -->                
+                    <xsd:enumeration value="decimal"/>
+                    <xsd:enumeration value="integer"/>
+                    <xsd:enumeration value="text"/>
+                    <xsd:enumeration value="file"/>
+                    <xsd:enumeration value="lexicon"/>
+                    <xsd:enumeration value="parameters"/>
+                    <xsd:enumeration value="query"/>
+                    <xsd:enumeration value="predicate"/>
+                    <xsd:enumeration value="list"/>
+                    <xsd:enumeration value="currParam"/>
+                    <xsd:enumeration value="currSim"/>
+                    <xsd:enumeration value="currGraph"/>
+                </xsd:restriction>
+            </xsd:simpleType>                                            
+           
+            <xsd:complexType name="jtFileNameType">
+                <xsd:sequence>
+                    <xsd:choice minOccurs="0" maxOccurs="1">                                
+                        <xsd:element name="absolute-path" type="xsd:string"/>
+                        <xsd:element name="relative-path" type="xsd:string"/>
+                    </xsd:choice>
+                    <xsd:element name="name" type="xsd:string" minOccurs="0" maxOccurs="1"/>                    
+                </xsd:sequence>
+            </xsd:complexType>            
+            
+            <xsd:complexType name="jtListOfPrimitivesType">
+                <xsd:sequence>
+                    <xsd:element name="arg" type="jtPrimitiveType" minOccurs="1" maxOccurs="unbounded"/>                       
+                </xsd:sequence>
+            </xsd:complexType>                        
+            
+            <xsd:complexType name="jtLexiconType">
+                <xsd:sequence>
+                    <xsd:element name="lexicon-name" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="lexeme" type="jtLexemeType" maxOccurs="unbounded"/>                        
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType name="jtLexemeType">
+                <xsd:sequence>
+                    <xsd:element name="phonology" type="xsd:string"/>
+                    <xsd:element name="frequency" type="xsd:decimal" minOccurs="0"/>
+                    <xsd:element name="label" type="xsd:string" minOccurs="0"/>        
+                    <xsd:element name="prime" type="xsd:decimal" minOccurs="0"/>        
+                    <!-- TBD: more lexicon characteristics -->                                                                            
+                </xsd:sequence>
+            </xsd:complexType>
+                                                
+            <xsd:complexType name="jtParametersType">            
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="lexicon" type="jtLexiconType"/>
+                    <xsd:element name="phonology" type="jtPhonologyType" minOccurs="0"/>
+                    <xsd:element name="StringParam">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="name" type="xsd:string"/>
+                                <xsd:element name="StringValue" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence> 
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="IntParam">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="name" type="xsd:string"/>
+                                <xsd:element name="IntValue" type="xsd:integer" minOccurs="0"/>
+                            </xsd:sequence> 
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="DecimalParam">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="name" type="xsd:string"/>
+                                <xsd:element name="DecimalValue" type="xsd:decimal" minOccurs="0"/>
+                            </xsd:sequence> 
+                        </xsd:complexType>
+                    </xsd:element> 
+                    <xsd:element name="StringParamRep">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="name" type="xsd:string"/>
+                                <xsd:element name="StringValue" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                            </xsd:sequence> 
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="IntParamRep">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="name" type="xsd:string"/>
+                                <xsd:element name="IntValue" type="xsd:integer" minOccurs="0" maxOccurs="unbounded"/>
+                            </xsd:sequence> 
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="DecimalParamRep">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="name" type="xsd:string"/>
+                                <xsd:element name="DecimalValue" type="xsd:decimal" minOccurs="0" maxOccurs="unbounded"/>
+                            </xsd:sequence> 
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+            
+            <xsd:simpleType name="jtModifiableParameterLabelsType">
+                <xsd:restriction base="xsd:string" >
+                    <xsd:enumeration value="alpha.if"/>
+                    <xsd:enumeration value="alpha.fp"/>
+                    <xsd:enumeration value="alpha.pw"/>
+                    <xsd:enumeration value="alpha.wp"/>
+                    <!--<xsd:enumeration value="alpha.pf"/>-->
+                    <xsd:enumeration value="gamma.f"/>
+                    <xsd:enumeration value="gamma.p"/>
+                    <xsd:enumeration value="gamma.w"/>
+                    <!--<xsd:enumeration value="lambda.f"/>-->
+                    <!--<xsd:enumeration value="lambda.p"/>-->
+                    <!--<xsd:enumeration value="lambda.w"/>-->
+                    <xsd:enumeration value="decay.f"/>
+                    <xsd:enumeration value="decay.p"/>
+                    <xsd:enumeration value="decay.w"/>
+                    <xsd:enumeration value="rest.f"/>
+                    <xsd:enumeration value="rest.p"/>
+                    <xsd:enumeration value="rest.w"/>
+                    <xsd:enumeration value="noiseSD"/>
+                    <xsd:enumeration value="stochasticitySD"/>
+                    
+                    <xsd:enumeration value="atten"/>
+                    <xsd:enumeration value="bias"/>
+                    <xsd:enumeration value="learningRate"/>
+                    <xsd:enumeration value="k-value"/>
+                                        
+                    <xsd:enumeration value="freqNode.RDL_wt_c"/>
+                    <xsd:enumeration value="freqNode.RDL_wt_s"/>
+                    <xsd:enumeration value="freqNode.RDL_wt"/>
+                    <xsd:enumeration value="freqNode.RDL_rest_c"/>
+                    <xsd:enumeration value="freqNode.RDL_rest_s"/>
+                    <xsd:enumeration value="freqNode.RDL_rest"/>
+                    <xsd:enumeration value="freqNode.RDL_post_c"/>
+                    <xsd:enumeration value="freqNode.RDL_post_s"/>
+                    <xsd:enumeration value="freqNode.RDL_post"/>
+                    
+                    <xsd:enumeration value="primeNode.RDL_wt_c"/>
+                    <xsd:enumeration value="primeNode.RDL_wt_s"/>
+                    <xsd:enumeration value="primeNode.RDL_wt"/>
+                    <xsd:enumeration value="primeNode.RDL_rest_c"/>
+                    <xsd:enumeration value="primeNode.RDL_rest_s"/>
+                    <xsd:enumeration value="primeNode.RDL_rest"/>
+                    <xsd:enumeration value="primeNode.RDL_post_c"/>
+                    <xsd:enumeration value="primeNode.RDL_post_s"/>
+                    <xsd:enumeration value="primeNode.RDL_post"/>
+                    
+                    <xsd:enumeration value="spread.1"/>
+                    <xsd:enumeration value="spread.2"/>
+                    <xsd:enumeration value="spread.3"/>
+                    <xsd:enumeration value="spread.4"/>
+                    <xsd:enumeration value="spread.5"/>
+                    <xsd:enumeration value="spread.6"/>
+                    <xsd:enumeration value="spread.7"/>
+                    <xsd:enumeration value="spreadscale.1"/>
+                    <xsd:enumeration value="spreadscale.2"/>
+                    <xsd:enumeration value="spreadscale.3"/>
+                    <xsd:enumeration value="spreadscale.4"/>
+                    <xsd:enumeration value="spreadscale.5"/>
+                    <xsd:enumeration value="spreadscale.6"/>
+                    <xsd:enumeration value="spreadscale.7"/>
+                    <xsd:enumeration value="min"/>
+                    <xsd:enumeration value="max"/>
+                    <xsd:enumeration value="modelInput"/>
+                    <xsd:enumeration value="nreps"/>
+                    <xsd:enumeration value="slicesPerPhon"/>
+                    <xsd:enumeration value="fslices"/>
+                    <xsd:enumeration value="lexicon"/>
+                    <xsd:enumeration value="continuumSpec"/>
+                    <xsd:enumeration value="deltaInput"/>                    
+                    <xsd:enumeration value="lengthNormalization"/>                    
+                </xsd:restriction>
+            </xsd:simpleType>
+            
+            <xsd:simpleType name="jtPhonemeLabelsType">
+                <xsd:restriction base="xsd:string" >
+                    <xsd:enumeration value="p"/>
+                    <xsd:enumeration value="b"/>
+                    <xsd:enumeration value="t"/>
+                    <xsd:enumeration value="d"/>
+                    <xsd:enumeration value="k"/>
+                    <xsd:enumeration value="g"/>
+                    <xsd:enumeration value="s"/>
+                    <xsd:enumeration value="S"/>
+                    <xsd:enumeration value="r"/>
+                    <xsd:enumeration value="l"/>
+                    <xsd:enumeration value="a"/>
+                    <xsd:enumeration value="i"/>
+                    <xsd:enumeration value="u"/>
+                    <xsd:enumeration value="^"/>
+                    <xsd:enumeration value="-"/>                                                
+                </xsd:restriction>
+            </xsd:simpleType>
+            
+            <xsd:simpleType name="jtFeatureLabelsType">
+                <xsd:restriction base="xsd:string" >
+                    <xsd:enumeration value="BUR"/>
+                    <xsd:enumeration value="VOI"/>
+                    <xsd:enumeration value="GRD"/>
+                    <xsd:enumeration value="ACU"/>
+                    <xsd:enumeration value="DIF"/>
+                    <xsd:enumeration value="VOC"/>
+                    <xsd:enumeration value="POW"/>                                                                    
+                </xsd:restriction>
+            </xsd:simpleType>
+            
+            <xsd:complexType name="jtQueryType">
+                <xsd:sequence>
+                    <xsd:choice>
+                        <xsd:element name="item-with-highest-peak">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="text"/>                                
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="fetch-current-value-of-a-parameter">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="parameter-name" type="jtModifiableParameterLabelsType"/>                                
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>                        
+                        <xsd:element name="current-input">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="text"/>                                
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="size-of-lexicon">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="int"/>                                
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>                        
+                        <xsd:element name="nth-item-in-lexicon">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="text"/>                                
+                                <xsd:element name="N" type="jtTextOrQueryType"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>                                                                                                
+                        <xsd:element name="query-one-simulation-cell">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="decimal"/>                                
+                                <xsd:element name="layer">
+                                    <xsd:complexType><xsd:choice>
+                                        <xsd:element name="word-layer">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="word" type="jtTextOrQueryType"/>
+                                                <xsd:element name="alignment" type="xsd:int"/>
+                                                <xsd:element name="cycle" type="xsd:int"/>                                                
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="phoneme-layer">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="phoneme" type="jtPhonemeLabelsType"/>
+                                                <xsd:element name="alignment" type="xsd:int"/>
+                                                <xsd:element name="cycle" type="xsd:int"/>                                                
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="feature-layer">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="feature" type="jtFeatureLabelsType"/>
+                                                <xsd:element name="alignment" type="xsd:int"/>
+                                                <xsd:element name="cycle" type="xsd:int"/>                                                
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="input-layer">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="feature" type="jtFeatureLabelsType"/>
+                                                <xsd:element name="alignment" type="xsd:int"/>
+                                                <xsd:element name="cycle" type="xsd:int"/>                                                
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                    </xsd:choice></xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence></xsd:complexType>                            
+                        </xsd:element>                                                                                                                                                            
+                        <xsd:element name="value-of-highest-peak">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="decimal"/>                                
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="item-with-nth-highest-peak">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="text"/>
+                                <xsd:element name="N" type="xsd:int"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>                    
+                        <xsd:element name="value-of-nth-highest-peak">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="decimal"/>
+                                <xsd:element name="N" type="xsd:int"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>                    
+                        <xsd:element name="peak-value-of-item">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="decimal"/>
+                                <xsd:element name="arg" type="jtTextOrQueryType"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="cycle-when-item-peaks">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="decimal"/>
+                                <xsd:element name="item" type="jtTextOrQueryType"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="cycle-when-item-exceeds-threshold">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="int"/>
+                                <xsd:element name="item" type="jtTextOrQueryType"/>
+                                <xsd:element name="threshold" type="xsd:decimal"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="nth-item-to-exceed-threshold">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="text"/>
+                                <xsd:element name="N" type="xsd:int"/>
+                                <xsd:element name="threshold" type="xsd:decimal"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>   
+                        <xsd:element name="decision-rule-report">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="text"/>                                
+                                <xsd:element name="threshold" type="xsd:decimal"/>
+                                <xsd:element name="item" type="jtTextOrQueryType"/>                                
+                                <xsd:element name="verbosity">
+                                    <xsd:simpleType>
+                                        <xsd:restriction base="xsd:int">
+                                            <xsd:enumeration value="1"/>
+                                            <xsd:enumeration value="2"/>
+                                            <xsd:enumeration value="3"/>
+                                        </xsd:restriction>
+                                    </xsd:simpleType>
+                                </xsd:element>                                                                
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="McClellend-1991-running-average-metric">
+                            <xsd:complexType><xsd:sequence>
+                                <xsd:element name="return-type" type="xsd:string" fixed="winner=1, loser=0"/>
+                                <xsd:element name="phoneme-one" type="jtPhonemeLabelsType" default="l"/>                                        
+                                <xsd:element name="phoneme-two" type="jtPhonemeLabelsType" default="r"/>                                    
+                                <xsd:element name="alignment" type="xsd:int" default="8"/>                                
+                                <xsd:element name="lambda" type="xsd:decimal" default="0.05"/>
+                                <xsd:element name="initial-value" type="xsd:decimal" default="-0.1"/>
+                            </xsd:sequence></xsd:complexType>
+                        </xsd:element>                        
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType name="jtActionType">
+                <xsd:choice>
+                    <xsd:element name="new-window">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="xsd:string" fixed="n/a"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="cancel-script">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="xsd:string" fixed="n/a"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-root-directory">
+                        <xsd:complexType><xsd:choice>
+                            <xsd:element name="use-script-file-path" type="xsd:string" fixed="Use the path of the saved/loaded script file as root."/>
+                            <xsd:element name="directory" type="xsd:string"/>
+                        </xsd:choice></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-cycles-per-sim">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="cycles" type="xsd:int" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="add-silence-to-input-edges">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="xsd:string" fixed="n/a"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                     
+                    <xsd:element name="write-to-a-file">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" />                            
+                            <xsd:element name="content">                            
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="arg" type="jtTextOrQueryType" minOccurs="1" maxOccurs="unbounded"/>                       
+                                    </xsd:sequence>
+                                </xsd:complexType>                        
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element> 
+                    <xsd:element name="analysis-settings">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="domain">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="WORDS"/>
+                                        <xsd:enumeration value="PHONEMES"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                            <xsd:element name="content-type">
+                                <xsd:complexType>
+                                    <xsd:choice>
+                                        <xsd:element name="ACTIVATIONS">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>                                        
+                                        <xsd:element name="RESPONSE-PROBABILITIES">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                                <xsd:element name="k" type="xsd:int" default="7"/>                                                    
+                                                <xsd:element name="choice-type">
+                                                    <xsd:simpleType>
+                                                        <xsd:restriction base="xsd:string" >
+                                                            <xsd:enumeration value="NORMAL"/>
+                                                            <xsd:enumeration value="FORCED"/>
+                                                        </xsd:restriction>
+                                                    </xsd:simpleType>                                                    
+                                                </xsd:element>                    
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="COMPETITION">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="processing">
+                                                    <xsd:simpleType>
+                                                        <xsd:restriction base="xsd:string" >
+                                                            <xsd:enumeration value="RAW"/>
+                                                            <xsd:enumeration value="FIRST-DERIVATIVE"/>
+                                                            <xsd:enumeration value="SECOND-DERIVATIVE"/>
+                                                        </xsd:restriction>
+                                                    </xsd:simpleType>                                                    
+                                                </xsd:element>                    
+                                                <xsd:element name="sampling-width" type="xsd:int" default="4"/>
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>                                        
+                                    </xsd:choice>
+                                </xsd:complexType>
+                            </xsd:element> 
+                            <xsd:element name="watch">
+                                <xsd:complexType>
+                                    <xsd:choice>
+                                        <xsd:element name="WATCH-TOP-N" type="xsd:int" default="10"/>                                            
+                                        <xsd:element name="WATCH-SPECIFIED">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="watch" type="jtTextOrQueryType" minOccurs="1" maxOccurs="unbounded"/>                       
+                                            </xsd:sequence></xsd:complexType>                        
+                                        </xsd:element>                                        
+                                    </xsd:choice>
+                                </xsd:complexType>
+                            </xsd:element>
+                            <xsd:element name="analysis-type">
+                                <xsd:complexType>
+                                    <xsd:choice>
+                                        <xsd:element name="SPECIFIED">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                                <xsd:element name="alignment" type="xsd:int" default="4"/>                                            
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="FRAUENFELDER">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                                <xsd:element name="alignment" type="xsd:int" default="4"/>                                            
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="MAX-POSTHOC">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="MAX-ADHOC">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="MAX-ADHOC-2">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>
+                                        <xsd:element name="AVERAGE">
+                                            <xsd:complexType><xsd:sequence>
+                                                <xsd:element name="note" type="xsd:string" fixed="" minOccurs="0"/>
+                                            </xsd:sequence></xsd:complexType>
+                                        </xsd:element>                                        
+                                    </xsd:choice>
+                                </xsd:complexType>                                
+                            </xsd:element>                    
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                                                
+                    <xsd:element name="set-input">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="input">
+                                <xsd:simpleType>
+                                  <xsd:restriction base="xsd:string">
+                                    <xsd:pattern value="[0-9pbtdkgsSrlaiux#\^\-]*"/>
+                                  </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="average-all-analyses-in-current-iteration-and-save-graph">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="labels-for-averaged-graph" type="jtTextOrQueryType" minOccurs="1" maxOccurs="unbounded"/>
+                                <xsd:element name="file" type="jtFileNameType"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="load-sim-from-file">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-lexicon">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="lexicon" type="jtLexiconType" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="load-lexicon">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element> 
+                    <xsd:element name="append-to-lexicon">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="target-parameter" type="xsd:string" fixed="lexicon" minOccurs="0"/>                                                                                                                        
+                                <xsd:choice>
+                                    <xsd:element name="list-of-words" type="jtLexiconType" minOccurs="0" maxOccurs="1"/>                                
+                                    <xsd:element name="one-word" type="jtTextOrQueryType"/>
+                                    <xsd:element name="lexicon-from-file" type="jtFileNameType" />                                                                        
+                                </xsd:choice>
+                            </xsd:sequence>
+                            </xsd:complexType>
+                    </xsd:element>   
+                    <xsd:element name="load-parameters">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="parameter-file" type="jtFileNameType" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                                        
+                    <xsd:element name="set-parameters">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="parameters" type="jtParametersType" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-a-parameter">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="parameter-name" type="jtModifiableParameterLabelsType" />
+                            <xsd:element name="value" type="jtPrimitiveType" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="increment-parameter-by-this-amount">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="parameter-name" type="jtModifiableParameterLabelsType" />
+                            <xsd:element name="amount" type="xsd:decimal" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="save-simulation-to-jt">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" minOccurs="0"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="save-simulation-to-txt">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" minOccurs="0"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="save-graph-to-png">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" minOccurs="0"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="save-graph-to-txt">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" minOccurs="0"/>
+                            <xsd:element name="save-option">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="append-to-single-file"/>
+                                        <xsd:enumeration value="multiple-files"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="reset-graph-defaults">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="xsd:string" fixed="n/a" />
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-domain">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="domain">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="WORDS"/>
+                                        <xsd:enumeration value="PHONEMES"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-watch-type">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="type">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="WATCH-TOP-N"/>
+                                        <xsd:enumeration value="WATCH-SPECIFIED"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-watch-top-n">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="N" type="xsd:int"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-watch-items">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="list">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="watch" type="jtTextOrQueryType" minOccurs="1" maxOccurs="unbounded"/>                       
+                                    </xsd:sequence>
+                                </xsd:complexType>                        
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-analysis-type">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="type">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="SPECIFIED"/>
+                                        <xsd:enumeration value="MAX-ADHOC"/>
+                                        <xsd:enumeration value="MAX-ADHOC-2"/>
+                                        <xsd:enumeration value="MAX-POSTHOC"/>
+                                        <xsd:enumeration value="FRAUNFELDER"/>
+                                        <xsd:enumeration value="AVERAGE"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-choice-type">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="type">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="NORMAL"/>
+                                        <xsd:enumeration value="FORCED"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-content-type">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="type">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="ACTIVATIONS"/>
+                                        <xsd:enumeration value="RESPONSE-PROBABILITIES"/>
+                                        <xsd:enumeration value="COMPETITION"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-comp-slope-width">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="width" type="xsd:int"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="set-comp-calc-type">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="type">
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string" >
+                                        <xsd:enumeration value="RAW"/>
+                                        <xsd:enumeration value="FIRST-DERIVATIVE"/>
+                                        <xsd:enumeration value="SECOND-DERIVATIVE"/>
+                                    </xsd:restriction>
+                                </xsd:simpleType>
+                            </xsd:element>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="set-k-value">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="exponent" type="xsd:int"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-alignment">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="alignment" type="xsd:int"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="add-one-analysis-item">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="jtTextOrQueryType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="remove-one-analysis-item">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="arg" type="jtTextOrQueryType"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-x-axis-bounds">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="left-bound" type="xsd:decimal"/>
+                            <xsd:element name="right-bound" type="xsd:decimal"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-y-axis-bounds">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="lower-bound" type="xsd:decimal"/>
+                            <xsd:element name="upper-bound" type="xsd:decimal"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-title">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="tip" type="xsd:string" fixed="Add args to list (in tree) to create a dynamic title." minOccurs="0" />
+                            <xsd:element name="title" type="xsd:string"/>                                
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-x-axis-label">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="label" type="xsd:string"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-y-axis-label">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="label" type="xsd:string"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="set-graph-input-position">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="position" type="xsd:int"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="save-parameters-to-jt">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" minOccurs="0"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                    <xsd:element name="save-parameters-to-txt">
+                        <xsd:complexType><xsd:sequence>
+                            <xsd:element name="file" type="jtFileNameType" minOccurs="0"/>
+                        </xsd:sequence></xsd:complexType>
+                    </xsd:element>                    
+                                                            
+                </xsd:choice>                                                            
+            </xsd:complexType>
+            
+            
+            <xsd:simpleType name="listBaseType">
+                <xsd:list itemType="xsd:decimal"/>
+            </xsd:simpleType> 
+            <xsd:simpleType name="listBaseTypeBool">
+                <xsd:list itemType="xsd:boolean"/>
+            </xsd:simpleType> 
+            
+            
+            <xsd:complexType name="jtPhonologyType">                
+                <xsd:sequence>                    
+                    <xsd:element name="languageName" type="xsd:string"/>
+                    <xsd:element name="phonemes">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="phoneme" maxOccurs="unbounded">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="symbol" type="xsd:string"/>
+                                            <!--TO DO: add restriction here that phoneme symbols must _not_ be a number or question mark. -->
+                                            <xsd:element name="features">    
+                                                <xsd:simpleType>
+                                                  <xsd:restriction base="listBaseType">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:maxLength value="1000"/>
+                                                  </xsd:restriction>
+                                                </xsd:simpleType>
+                                            </xsd:element>
+                                            <xsd:element name="durationScalar" minOccurs="0">    
+                                                <xsd:simpleType>
+                                                  <xsd:restriction base="listBaseType">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:maxLength value="1000"/>
+                                                  </xsd:restriction>
+                                                </xsd:simpleType>
+                                            </xsd:element>
+                                            <xsd:element name="allophonicRelations" minOccurs="0">    
+                                                <xsd:simpleType>
+                                                  <xsd:restriction base="listBaseTypeBool">
+                                                    <xsd:minLength value="1"/>
+                                                    <xsd:maxLength value="1000"/>
+                                                  </xsd:restriction>
+                                                </xsd:simpleType>
+                                            </xsd:element>
+                                        </xsd:sequence>
+                                    </xsd:complexType>
+                                </xsd:element>                              
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>                   
+                </xsd:sequence>                
+            </xsd:complexType>
+            
+            <xsd:complexType name="jtGraphType">
+                <xsd:sequence>
+                    <xsd:element name="title" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="report" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="modelInput" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="spread" type="xsd:int" minOccurs="0"/>
+                    <xsd:element name="fromLeft" type="xsd:int" minOccurs="0"/>
+                    <xsd:element name="toRight" type="xsd:int" minOccurs="0"/>
+                    <xsd:element name="labels">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="label" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data"> 
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="row" minOccurs="0" maxOccurs="unbounded">
+                                    <xsd:complexType>
+                                        <xsd:sequence>
+                                            <xsd:element name="label" type="xsd:string" minOccurs="0"/>
+                                            <xsd:element name="d" type="xsd:decimal" minOccurs="0" maxOccurs="unbounded"/>
+                                        </xsd:sequence>
+                                    </xsd:complexType>
+                                </xsd:element>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <!-- schema elements for loading cTRACE data sets. -->
+            <xsd:element name="inputData">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="row" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="feat" type="xsd:string" minOccurs="0"/>
+                                    <xsd:element name="cont" type="xsd:int" minOccurs="0"/>
+                                    <xsd:element name="a" type="xsd:decimal" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="featureData">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="row" maxOccurs="unbounded">                            
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="feat" type="xsd:string" minOccurs="0"/>
+                                    <xsd:element name="cont" type="xsd:int" minOccurs="0"/>
+                                    <xsd:element name="a" type="xsd:decimal" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            
+            <xsd:element name="phonemeData">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="row" maxOccurs="unbounded">                            
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="phon" type="xsd:string"/>
+                                    <xsd:element name="a" type="xsd:decimal" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            
+            <xsd:element name="wordData">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="row" maxOccurs="unbounded">                            
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="word" type="xsd:string"/>
+                                    <xsd:element name="a" type="xsd:decimal" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            
+</xsd:schema>

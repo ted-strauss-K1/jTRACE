@@ -1,0 +1,79 @@
+
+package edu.uconn.psy.jtrace.Model;
+
+import edu.uconn.psy.jtrace.Model.TracePhones;
+import java.lang.ClassCastException;
+
+/**
+ * TraceWord defines a tuple for representing TRACE words. The string, of course,
+ * plus frequency and familiarity (currently unused) information. TraceWords are
+ * immutable, like Strings, and are valid if they contain only legal phones.
+ *
+ * @author Rafi Pelosoff
+ * @author Ted Strauss
+ * @author Harlan Harris
+ */
+public class TraceWord implements Comparable {
+    private String phon;
+    private double freq;
+    private double famil;
+    private boolean valid;
+    
+    public TraceWord()
+    {
+        phon="this is not a word";
+        valid = false;
+    }
+    
+    public TraceWord(String _p) {
+        phon = _p.trim();
+        freq= 0.0;
+        valid = TracePhones.validTraceWord(phon);
+    }
+    
+    public TraceWord(String _p, double _f) {
+        phon = _p.trim();
+        freq = _f;
+        valid = TracePhones.validTraceWord(phon);
+    }
+
+    /** 
+     * For Comparable interface.
+     */
+    // WEIRD!
+    public int compareTo(Object that) throws ClassCastException
+    {
+        if (that instanceof TraceWord)
+            return this.phon.compareTo(((TraceWord)that).phon); 
+        else
+            throw new ClassCastException("expected TraceWord object");
+    }
+    
+    public String getPhon(){return phon;} 
+    public double getFrequency(){return freq;}
+    public double getFamiliarity(){return famil;}
+    public boolean getValid(){return valid;}
+    public String XMLTag(){
+        String result="";
+        result+="<lexeme>";
+        result+="<phonology>"+phon+"</phonology>";
+        if(freq!=0) result+="<frequency>"+freq+"</frequency>";
+        if(famil!=0) result+="<familiarity>"+famil+"</familiarity>";
+        result+="</lexeme>";
+        return result;
+    }
+    
+    /**
+     * Given a string, construct a new string with leading and training
+     * dashes (if any) removed.
+     */
+    public static String stripDashes(String s)
+    {
+       return s.replaceAll("\\A-*(.*?)-*\\Z", "$1"); 
+    }
+    
+    // TraceWords are static/immutable!
+//    public void setFrequency(double _f){freq=_f;}
+//    public void setPhon(String _p){phon=_p.trim();}
+//    public void setFamiliarity(double _f){famil=_f;}
+}

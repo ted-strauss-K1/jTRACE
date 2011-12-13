@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="209"
+   name=""
+   committed-date="2005-08-22T20:25:55.413954Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu/uconn/psy/jtrace/Model/Scripting/impl"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="209"/>
+<entry
+   committed-rev="196"
+   name="FourTupleIterator.java"
+   text-time="2005-07-12T20:27:34.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="1b079b5345ac364f085f558795269872"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="212"
+   name="GraphActionWorkhorse.java"
+   text-time="2005-09-04T15:59:49.000000Z"
+   committed-date="2005-09-04T16:18:09.555688Z"
+   checksum="f403818359db3ca295a1934698078a14"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"
+   revision="212"/>
+<entry
+   committed-rev="199"
+   name="PredicateWorkhorse.java"
+   text-time="2005-07-13T19:18:30.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="bb95968e00cd0b59f61d3667a501b997"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="210"
+   name="PhonemeIterator.java"
+   text-time="2005-08-23T15:05:58.000000Z"
+   committed-date="2005-08-23T15:16:31.866835Z"
+   checksum="d80e7335f107eb5fb757b621c4882ebe"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"
+   revision="210"/>
+<entry
+   committed-rev="207"
+   name="DummyIterator.java"
+   text-time="2005-08-19T23:05:12.000000Z"
+   committed-date="2005-08-22T16:19:21.446062Z"
+   checksum="4b50870d2fa92fc0063fe7eb2a50c84c"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="206"
+   name="IntegerIterator.java"
+   text-time="2005-08-23T15:05:58.000000Z"
+   committed-date="2005-08-15T21:48:51.987854Z"
+   checksum="0ac17dd7ae48e89962fcda6847af45d1"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"/>
+<entry
+   committed-rev="210"
+   name="QueryWorkhorse.java"
+   text-time="2005-08-21T03:50:07.000000Z"
+   committed-date="2005-08-23T15:16:31.866835Z"
+   checksum="e3f3a7f82d29b462d4d6b42e812e8d5a"
+   last-author="ted"
+   kind="file"
+   revision="210"/>
+<entry
+   committed-rev="68"
+   name="JTraceScriptingException.java"
+   text-time="2005-05-12T15:24:36.000000Z"
+   committed-date="2005-05-12T15:27:00.896514Z"
+   checksum="b65d4a159f16e8d4021e4cc841fba990"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="206"
+   name="PredicateIterator.java"
+   text-time="2005-08-23T15:05:58.000000Z"
+   committed-date="2005-08-15T21:48:51.987854Z"
+   checksum="7188cf7606cc9ae305cd4d46b0768485"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"/>
+<entry
+   committed-rev="211"
+   name="FloatIterator.java"
+   text-time="2005-08-24T13:10:11.000000Z"
+   committed-date="2005-08-29T20:49:56.779486Z"
+   checksum="140c1685a9dbe7f695ec253d4290717a"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-08-22T16:39:41.000000Z"
+   revision="211"/>
+<entry
+   committed-rev="196"
+   name="StringIterator.java"
+   text-time="2005-07-12T20:43:22.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="ac218c1c9049855aa88717dffdbcd11c"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="ParameterActionWorkhorse.java"
+   text-time="2005-07-12T23:03:05.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="7d3af8f3e960c8377a2afcc720c4c4a7"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="110"
+   name="Workhorse.java"
+   text-time="2005-05-25T22:19:43.000000Z"
+   committed-date="2005-05-27T04:31:18.074794Z"
+   checksum="c156c4c69f39b426196e31680db73878"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="FourTuple.java"
+   text-time="2005-07-12T20:44:36.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="313c622b5cb482a6be8b8a8de743f88f"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="151"
+   name="SimActionWorkhorse.java"
+   text-time="2005-06-10T17:30:06.000000Z"
+   committed-date="2005-06-12T16:52:40.479949Z"
+   checksum="ab6ed25edbfe767f5a5fafeb73242100"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="197"
+   name="LexicalIterator.java"
+   text-time="2005-07-13T13:24:15.000000Z"
+   committed-date="2005-07-13T16:10:54.374991Z"
+   checksum="fc925a34599533e9a7049e8074707c3a"
+   last-author="ted"
+   kind="file"/>
+</wc-entries>

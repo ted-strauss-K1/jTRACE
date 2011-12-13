@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+X-COMMENT: Main-Class will be added automatically by build
+Class-Path: libs/jaxb-api.jar libs/jaxb-impl.jar libs/jaxb-libs.jar libs/jaxb-xjc.jar \
+    libs/jaxp-api.jar libs/namespace.jar libs/jax-qname.jar libs/relaxngDatatype.jar \
+    libs/dom.jar libs/sax.jar libs/xsdlib.jar libs/xalan.jar libs/xercesImpl.jar \
+    libs/gnujaxp.jar libs/jcommon-1.0.0-pre2.jar libs/jfreechart-1.0.0-pre2.jar \
+    libs/junit.jar libs/servlet.jar libs/xml-apis.jar libs/xsdlib.jar \
+    libs/log4j.jar libs/jimi.jar libs/jgoodiesLF.jar libs/jaxfront-xuieditor.jar \
+    libs/jaxfront-swing.jar libs/jaxfront-dbm.jar libs/jaxfront-core.jar \
+    libs/hsql.jar libs/commons-logging.jar libs/commons-httpclient-2.0.1.jar \
+    libs/commons-collections.jar libs/commons-beanutils.jar libs/castor-0.9.5.3-xml.jar \
+    libs/resolver.jar
+
+

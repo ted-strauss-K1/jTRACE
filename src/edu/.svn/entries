@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="202"
+   name=""
+   committed-date="2005-07-14T15:46:44.305451Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   name="uconn"
+   kind="dir"/>
+</wc-entries>

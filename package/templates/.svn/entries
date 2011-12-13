@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="196"
+   name=""
+   committed-date="2005-07-13T07:23:27.738292Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/templates"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="196"
+   name="contribution-of-feedback.jt"
+   text-time="2005-07-12T05:23:12.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="b192281c31febf0597560ce02e2afab1"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="lexical-iterator.jt"
+   text-time="2005-07-13T05:53:13.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="29b5a0069598f4e73e96eabcc0ae6e09"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="183"
+   name="basic-template.jt"
+   text-time="2005-07-04T20:33:36.000000Z"
+   committed-date="2005-07-04T22:48:38.132290Z"
+   checksum="aabde1d26539c94db233b02da67afd22"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="word-pair-segmentation.jt"
+   text-time="2005-07-13T05:55:16.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="c76839f80c431f7518c62087928d25a4"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="2D-parameter-space-and-lexical-iterator.jt"
+   text-time="2005-07-12T01:32:39.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="76ec2e31a9d6a86acd988b0ad4fafcd7"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="eye-tracking-and-graph-averaging.jt"
+   text-time="2005-07-13T05:53:41.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="bb42a0f38f55dc3d29bcd9057879bf99"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="noise-and-predicate-iterator.jt"
+   text-time="2005-07-13T04:51:54.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="9c7236f01fc79d934c1d4bcb5d5f19c3"
+   last-author="ted"
+   kind="file"/>
+</wc-entries>

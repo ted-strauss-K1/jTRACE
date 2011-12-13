@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="180"
+   name=""
+   committed-date="2005-06-30T17:30:23.911985Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/nbproject"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="180"
+   name="project.properties"
+   text-time="2005-07-04T22:55:29.000000Z"
+   committed-date="2005-06-30T17:30:23.911985Z"
+   checksum="4475684247dd9c1e1b1cd03bca085dd2"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:29.000000Z"/>
+<entry
+   committed-rev="120"
+   name="project.xml"
+   text-time="2005-06-01T19:43:08.000000Z"
+   committed-date="2005-06-02T17:11:56.908148Z"
+   checksum="74802c9636cf3fe05544ff871a602b44"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-01T19:34:05.000000Z"/>
+<entry
+   committed-rev="120"
+   name="genfiles.properties"
+   text-time="2005-06-01T19:43:10.000000Z"
+   committed-date="2005-06-02T17:11:56.908148Z"
+   checksum="ae378634a8692913ff8f8894fddc49d5"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-01T19:34:05.000000Z"/>
+<entry
+   name="private"
+   kind="dir"/>
+<entry
+   committed-rev="120"
+   name="build-impl.xml"
+   text-time="2005-06-01T19:43:10.000000Z"
+   committed-date="2005-06-02T17:11:56.908148Z"
+   checksum="12396131f220450c1bfce244a44c6945"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-01T19:34:05.000000Z"/>
+</wc-entries>

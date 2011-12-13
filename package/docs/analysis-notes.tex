@@ -1,0 +1,223 @@
+% description of analysis options in jTRACE
+% $Id: analysis-notes.tex 198 2005-07-13 23:05:38Z harlan $
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fullpage}
+
+\def\argmax{\mathop{\rm arg\,max}}
+
+\begin{document}
+
+\title{Analysis Options in jTRACE}
+
+\maketitle
+
+\section{Introduction}
+
+This document describes, in mathematical detail, the analysis options in
+the Graphing... Analysis... tab of jTRACE. 
+
+Words or Phonemes can be analyzed. Recall that for each cycle of the model,
+both of these matricies is two-dimensional, where one dimension is the item
+(particular word or phoneme) and the other dimension is a time slice, 
+indicating the model's representation of past, present, and future. 
+
+The content of an analysis can be either raw Activations, or Luce Choice
+Rule (LCR) Response Probabilities. If the latter, then the Luce Choice options
+(described below) can be specified.
+
+A subset of Items can be displayed. If Response Probabilities are used, 
+probabilities are computed for only those words/phonemes.
+
+The Alignment can be specified, where Alignment refers to which of the time
+slices is used. When Alignment is Specified, then only that time slice is
+used. For example, when preceded by the silence phone, '-', jTRACE words 
+are generally activated at time slice 4, so setting Specified = 4 when
+graphing words will result
+in a graph of words that are aligned with the start of the utterance. If 
+phonemes are being graphed, or
+parameters are changed, or more or less silence is used, or multiple words
+are present, other options may make more sense. Average alignment averages
+over all time slices, for each item. Max (Ad-Hoc) finds the best alignment for
+each item, for each time cycle. Max (Post-Hoc) finds the single
+best alignment for each word. The Frauenfelder rule is the average activation
+of the item at the specified and subsequent alignment, where all items that
+have time slices overlapping with the target item are potential responses.
+(This rule is a bit clearer mathematically than in words.)
+
+\section{Notation}
+
+$R$ is a 3-D matrix of the raw data, $R_{c,i,s}$, where $c \in [0..C-1]$ is
+time cycle, and $C$ is the total number of cycles, $i \in [0..I-1]$ is
+the item index, and $I$ is the total number of items, and $s \in [0..S-1]$ is
+the time slice, and $S$ is the total number of time slices. For example,
+$R_{2,3,4}$ is the raw activation of the $i$'th item aligned with time slice
+$s$, after $c$ steps of the model.
+
+$R'$ is the response strength, calculated as $R' = e^{(\frac{R-min}{max-min})
+k}$, where $min$ and $max$ are the minimum and maximum node activation values,
+and $k \in \mathbb{N}$ is the usual exponent parameter in the LCR.
+
+$P$ is the 2-D matrix of plottable data, the output of the analysis process,
+$P_{i,c}$, where $i \in [0..\vert w \vert-1]$, and $\vert w \vert$ is the
+number of specified items, and $c$ is the time cycle, as above.
+
+$w \subset {0,I-1}$ is a set of indicies, selected by the user, to be plot,
+and indexed $w_j$.
+
+$a \in {0..S-1}$ is the specified alignment.
+
+\section{Analysis options}
+
+There are 3 possible analyses (Activations, Response Probabilities
+with Normal Choice, and Response Probabilities with Forced Choice), and
+5 possible alignments (Average, Max (Ad-Hoc), Max (Post-Hoc), Specified, and
+Frauenfelder), giving 15 possible computations.
+
+\vspace{.3in}
+
+%\begin{small}
+\begin{tabular}{r|p{1.7in}|p{1.7in}|p{1.7in}}
+ & Activations/* & RPs/Normal & RPs/Forced \\
+\hline
+Average &
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{1}{S} \sum_{s=0}^{S-1} R_{c,w_j,s}.
+\end{gather*}
+\end{minipage}
+&
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{1}{S} \sum_{s=0}^{S-1} 
+\frac{R'_{c,w_j,s}}{\sum_{i=0}^{I-1} R'_{c,i,s}}.
+\end{gather*}
+\end{minipage}
+& 
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{1}{S} \sum_{s=0}^{S-1} 
+\frac{R'_{c,w_j,s}}{\sum_{k=0}^{\vert w \vert} R'_{c,w_k,s}}.
+\end{gather*}
+\end{minipage}
+\\
+\hline
+Max (Ad-Hoc) &
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall i, 0 \le i < I, \forall c, 0 \le c < C,\\
+a_{i,c} = \argmax_a R_{c,i,a}, \\
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = R_{c,w_j,a_{w_j,c}}.
+\end{gather*}
+\end{minipage}
+&
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall i, 0 \le i < I, \forall c, 0 \le c < C,\\
+a_{i,c} = \argmax_a R_{c,i,a}, \\
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{R'_{c,w_j,a_{w_j,c}}}
+{\sum_{\iota=0}^{I-1} R'_{c,\iota,a_{w_\iota,c}}}.
+\end{gather*}
+\end{minipage}
+& 
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall i, 0 \le i < I, \forall c, 0 \le c < C,\\
+a_{i,c} = \argmax_a R_{c,i,a}, \\
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{R'_{c,w_j,a_{w_j,c}}}
+{\sum_{k=0}^{\vert w \vert} R'_{c,w_k,a_{w_k,c}}}.
+\end{gather*}
+\end{minipage}
+\\
+\hline
+Max (Post-Hoc) &
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall i, 0 \le i < I \\
+a_{i} = \argmax_a \max_c R_{c,i,a}, \\
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = R_{c,w_j,a_{w_j}}.
+\end{gather*}
+\end{minipage}
+&
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall i, 0 \le i < I \\
+a_{i} = \argmax_a \max_c R_{c,i,a}, \\
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{R'_{c,w_j,a_{w_j}}}
+{\sum_{i=0}^{I-1} R'_{c,i,a_{w_j}}}.
+\end{gather*}
+\end{minipage}
+& 
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall i, 0 \le i < I \\
+a_{i} = \argmax_a \max_c R_{c,i,a}, \\
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{R'_{c,w_j,a_{w_j}}}
+{\sum_{k=0}^{\vert w \vert} R'_{c,w_k,a_{w_k}}}.
+\end{gather*}
+\end{minipage}
+\\
+\hline
+Specified &
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = R_{c,w_j,a}.
+\end{gather*}
+\end{minipage}
+&
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{R'_{c,w_j,a}}
+{\sum_{i=0}^{I-1} R'_{c,i,a}}.
+\end{gather*}
+\end{minipage}
+& 
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{R'_{c,w_j,a}}
+{\sum_{k=0}^{\vert w \vert} R'_{c,w_k,a}}.
+\end{gather*}
+\end{minipage}
+\\
+\hline
+Frauenfelder &
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{1}{2} (R_{c,w_j,a} + R_{c,w_j,a+1}).
+\end{gather*}
+\end{minipage}
+&
+\begin{minipage}{1.7in}
+\begin{gather*}
+\forall j, 0 \le j < \vert w \vert, \forall c, 0 \le c < C,\\
+P_{j,c} = \frac{(R_{c,w_j,a} + R_{c,w_j,a+1})} \\
+{ 2 \sum_{s=0}^{S-1} \sum_{i=0}^{I-1} R'_{c,i,s} \Omega_{s}}, \text{where}\\
+\Omega_{s} = 1 \text{if} a - z < s < a + z + t^{length}, \\
+z = w_i^{length} \frac{\text{deltaInput}}{\text{slicesPerPhon}}, \\
+w_i^{length} \text{is the length of item} i,\\
+t^{length} \text{is the length of the target item}.
+\end{gather*}
+\end{minipage}
+& 
+3
+\end{tabular}
+%\end{small}
+
+\end{document}
+
+

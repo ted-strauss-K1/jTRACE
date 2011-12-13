@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="199"
+   name=""
+   committed-date="2005-07-14T15:25:11.274322Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/docs"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   name="pix"
+   kind="dir"/>
+<entry
+   committed-rev="199"
+   name="manual.html"
+   text-time="2005-07-14T15:20:39.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="2ee29aabf3c0497b3c895ef454f748f0"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-07-14T13:46:25.000000Z"/>
+<entry
+   committed-rev="198"
+   name="analysis-notes.tex"
+   text-time="2005-07-14T13:46:25.000000Z"
+   committed-date="2005-07-13T23:05:38.897863Z"
+   checksum="304f5ae7a2ff3c95c4458ce0334d45fe"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T13:46:25.000000Z"/>
+<entry
+   committed-rev="18"
+   name="manual.txt"
+   text-time="2005-06-29T05:58:15.000000Z"
+   committed-date="2005-04-06T19:15:49.003886Z"
+   checksum="5b3740e047e788bfcb2030e09f43fc1b"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T05:58:15.000000Z"/>
+</wc-entries>

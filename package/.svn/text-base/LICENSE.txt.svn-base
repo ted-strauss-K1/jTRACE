@@ -1,0 +1,35 @@
+Copyright (C) 2005 Ted Strauss, James Magnuson, and the University of 
+Connecticut
+
+We would like to acknowledge the contributions in writing the software of
+Raphael Pelosoff, and the contributions in testing, debugging, and 
+documentation of Harlan Harris. We would also like to express our 
+appreciation to Jay McClelland and Jeff Elman for making available the 
+source code to the original TRACE model, which has significantly facilitated 
+this implementation.
+
+Additional copyright notices and license terms applicable to portions of the 
+software are set forth in the THIRDPARTYLICENSE.txt file.
+
+This software is copyright under the following conditions:
+
+Permission to use, copy, and modify this software and its documentation for
+any purpose other than distribution-for-profit is hereby granted without fee,
+provided that the above copyright notice and this permission notice appear in
+all copies of the software and related documentation.
+
+Permission to distribute the software or modified or extended versions thereof
+on a not-for-profit basis is explicitly granted, under the above conditions.
+HOWEVER, THE RIGHT TO DISTRIBUTE THE SOFTWARE OR MODIFIED OR EXTENDED VERSIONS
+THEREOF FOR PROFIT IS *NOT* GRANTED EXCEPT BY PRIOR ARRANGEMENT AND WRITTEN
+CONSENT OF THE COPYRIGHT HOLDERS.
+
+THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND, EXPRESS,
+IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF
+MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+IN NO EVENT SHALL THE UNIVERSITY OF CONNECTICUT BE LIABLE FOR ANY SPECIAL,
+INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND, OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER OR NOT ADVISED
+OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF LIABILITY, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. 

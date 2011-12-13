@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="199"
+   name=""
+   committed-date="2005-07-14T15:25:11.274322Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu/uconn/psy/jtrace/IO"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="209"/>
+<entry
+   committed-rev="21"
+   name="GraphicFileFactory.java"
+   text-time="2005-04-07T17:23:34.000000Z"
+   committed-date="2005-04-11T17:02:22.671274Z"
+   checksum="c707ba9f1ddb8d02eae5c615f0752738"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="135"
+   name="XMLFileFilter.java"
+   text-time="2005-06-07T22:48:28.000000Z"
+   committed-date="2005-06-07T22:48:34.866769Z"
+   checksum="6168bcfd3284acbd74d445440dac868b"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-07T22:48:28.000000Z"/>
+<entry
+   committed-rev="179"
+   name="WTFileWriter.java"
+   text-time="2005-06-29T18:52:40.000000Z"
+   committed-date="2005-06-30T03:36:11.132629Z"
+   checksum="3a51987dd7b15d17e2e1109b567ec9a0"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-12T18:24:28.000000Z"/>
+<entry
+   committed-rev="196"
+   name="FileNameFactory.java"
+   text-time="2005-07-12T22:49:26.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="888427fc0243a15e40e6de0a1ab8e222"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="94"
+   name="PNGFileFilter.java"
+   text-time="2005-05-24T16:15:46.000000Z"
+   committed-date="2005-05-24T16:15:47.411781Z"
+   checksum="4a1e938cc2ed4e7e432e6ffbc422b461"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-24T16:15:46.000000Z"/>
+<entry
+   committed-rev="196"
+   name="ScriptingThread.java"
+   text-time="2005-07-13T04:42:17.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="3fd9aea48dc8f3969cae5ea672ef38fb"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="41"
+   name="simTask.java"
+   text-time="2005-05-06T05:14:11.000000Z"
+   committed-date="2005-05-05T18:49:58.626737Z"
+   checksum="e728cc56316e5f7026deaa4615e48420"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-05-06T05:14:11.000000Z"/>
+<entry
+   committed-rev="210"
+   name="WTFileReader.java"
+   text-time="2005-08-20T00:54:29.000000Z"
+   committed-date="2005-08-23T15:16:31.866835Z"
+   checksum="4f5c9f040660c8c8c25c2545c9c71853"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-06T05:14:11.000000Z"
+   revision="210"/>
+<entry
+   committed-rev="179"
+   name="XAmpleThread.java"
+   text-time="2005-06-29T18:51:02.000000Z"
+   committed-date="2005-06-30T03:36:11.132629Z"
+   checksum="afe78b55b8fb8e20e4b92307d9eb0241"
+   last-author="ted"
+   kind="file"/>
+</wc-entries>

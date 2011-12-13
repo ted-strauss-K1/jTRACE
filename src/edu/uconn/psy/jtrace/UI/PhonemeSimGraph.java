@@ -1,0 +1,120 @@
+/*
+ * PhonemeSimGraph.java
+ *
+ * Created on May 11, 2005, 11:49 AM
+ */
+
+package edu.uconn.psy.jtrace.UI;
+
+import edu.uconn.psy.jtrace.Model.*;
+import java.awt.*;
+import java.awt.geom.*;
+
+/**
+ *
+ * @author harlan
+ */
+public class PhonemeSimGraph extends AbstractSimGraph
+{
+    
+    public PhonemeSimGraph(TraceParam _tp, double [][] _d, int _n, int _i,
+            double _min, double _max) 
+    {
+        super(_tp, _d, _n, _i, _min, _max);
+        
+        xAxisLabel = "Temporal Alignment";
+        yAxisLabel = "Phoneme";
+        title = "Phoneme Activations";
+     
+        // sanity check
+        if (rows != tp.getPhonology().getLabels().length)
+        {
+            System.out.println("rows != TracePhones.getLabels().length");
+        }
+    }
+    
+    protected void getFixedSizes(Graphics g)
+    {
+        super.getFixedSizes(g);
+        
+        FontMetrics fm;
+        
+        fm = g.getFontMetrics(fTickLabel);
+        szYTickLabel = (int)fm.getStringBounds("/M/", g).getWidth();    
+        
+    }
+    /** 
+     * Over-ride abstract method. X axis is as normal. Y axis plots the phoneme
+     * labels.
+     */
+    protected void plotTicks(Rectangle plotRect, Graphics2D g2)
+    {
+        int tickLength = (int)(szSmallBuf * .7);
+        
+        double boxHeight = plotRect.getHeight() / rows;
+        double boxWidth = plotRect.getWidth() / cols;
+       
+        g2.setColor(Color.BLACK);
+        g2.setFont(fTickLabel);
+        
+        // foreach row, plot a tick mark. 
+        // foreach col, plot a tick mark.
+        // and plot 15 X tick labels
+        
+        // Y tick labels are difficult:
+        // for each phoneme, plot a label and tick mark
+        
+        // plot if col % colLabelInterval == 0
+        int colLabelInterval = (int)(cols / 15);
+        
+        // foreach row
+        for (int row = 0; row < rows; row++)
+        {
+            // position of the top of each row
+            int yPos = (int)Math.round(plotRect.getY() + (row * boxHeight));
+            
+            // draw the tick mark
+            g2.drawLine((int)Math.round(plotRect.getX() - tickLength), yPos, 
+                    (int)Math.round(plotRect.getX()), yPos);
+            
+            // compute the size of this label
+            String label = tp.getPhonology().getLabels()[row];
+            Rectangle2D labelRect =(g2.getFontMetrics(fTickLabel)).getStringBounds(label, g2);
+
+            // label is right-justified on tickmark and below the tick
+            int xLabelPos = (int)Math.round(plotRect.getX() - szSmallBuf - labelRect.getWidth());
+            int yLabelPos = (int)Math.round(yPos + labelRect.getHeight());
+
+            //g2.rotate(-java.lang.Math.PI/2, xLabelPos, yLabelPos);
+            g2.drawString(label, xLabelPos, yLabelPos);
+            //g2.rotate(java.lang.Math.PI/2, xLabelPos, yLabelPos);
+            
+        }
+        
+        // this is the same as in AbstractSimGraph
+        for (int col = 0; col < cols; col++)
+        {
+            // position of the left of each column
+            int xPos = (int)Math.round(plotRect.getX() + (col * boxWidth));
+            
+            // draw the tick mark
+            g2.drawLine(xPos, (int)Math.round(plotRect.getY() + plotRect.getHeight()),
+                    xPos, (int)Math.round(plotRect.getY() + plotRect.getHeight() + tickLength));
+            
+            if (col % colLabelInterval == 0)
+            {
+                // compute the size of this label
+                String label = Integer.toString(col);
+                Rectangle2D labelRect =(g2.getFontMetrics(fTickLabel)).getStringBounds(label, g2);
+                
+                // lower-left of label is a szSmallBuf + szTickLabel below the plot and centered on its tickmark
+                int xLabelPos = (int)Math.round(xPos - labelRect.getWidth() / 2);
+                int yLabelPos = (int)Math.round(plotRect.getY() + plotRect.getHeight() + szSmallBuf + szXTickLabel);
+                
+                g2.drawString(Integer.toString(col), xLabelPos, yLabelPos);
+                
+            }
+        }
+    }
+    
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="184"
+   name=""
+   committed-date="2005-07-04T23:28:54.674777Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/schema"
+   last-author="ted"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="184"
+   name="jt.xui"
+   text-time="2005-07-01T21:43:54.000000Z"
+   committed-date="2005-07-04T23:28:54.674777Z"
+   checksum="1414a8d8192bde61c85bf17c8f772e3f"
+   last-author="ted"
+   kind="file"/>
+</wc-entries>

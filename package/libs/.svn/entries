@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="190"
+   name=""
+   committed-date="2005-07-06T17:33:07.340763Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/libs"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="9"
+   name="jaxb-xjc.jar"
+   text-time="2005-06-29T06:16:41.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="6283b458c1c1d34f643d5ba7487cdb9f"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:01:12.000000Z"/>
+<entry
+   committed-rev="9"
+   name="jaxp-api.jar"
+   text-time="2005-06-29T06:16:41.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="2c273980b89f8b8a71f0df5031f66c7d"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:01:29.000000Z"/>
+<entry
+   committed-rev="78"
+   name="gnujaxp.jar"
+   text-time="2005-06-29T06:16:41.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="03251779fa71e7b47a36e88f96dcd9ac"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:07:37.000000Z"/>
+<entry
+   committed-rev="78"
+   name="jfreechart-1.0.0-pre2.jar"
+   text-time="2005-06-29T06:16:41.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="1f384c8636a2e53a8106e6ad5759ff30"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:09:24.000000Z"/>
+<entry
+   committed-rev="182"
+   name="log4j.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="18a4ca847248e5b8606325684342701c"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:31.000000Z"/>
+<entry
+   committed-rev="182"
+   name="jaxfront-swing.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="5646c8ea2ed8875daf5a0867c743658c"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:32.000000Z"/>
+<entry
+   committed-rev="9"
+   name="jaxb-impl.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="4b42a8c5f3656557279bc027ca5997b1"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:09:32.000000Z"/>
+<entry
+   committed-rev="78"
+   name="servlet.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="e464fc7c8df0648ee7f7d53470de023b"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:09:37.000000Z"/>
+<entry
+   committed-rev="182"
+   name="commons-collections.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="026fc64b9c69acfb9eca8414d6ed8fed"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:32.000000Z"/>
+<entry
+   committed-rev="182"
+   name="jimi.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="60d7ceb6064bf39292e0924c4acba6c0"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:32.000000Z"/>
+<entry
+   committed-rev="9"
+   name="namespace.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="99e0ef05497facc13a57befe6b064bd8"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:10:15.000000Z"/>
+<entry
+   committed-rev="182"
+   name="castor-0.9.5.3-xml.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="530dd40f024f31e4d72fc82f06ad9ca6"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:36.000000Z"/>
+<entry
+   committed-rev="9"
+   name="xalan.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="196b59e9442364f064a6666b1eb41cbc"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:16:40.000000Z"/>
+<entry
+   committed-rev="182"
+   name="jaxfront-xuieditor.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="ef127af28334eaa307e1e598dae88d94"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:42.000000Z"/>
+<entry
+   committed-rev="182"
+   name="hsql.jar"
+   text-time="2005-07-04T22:55:48.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="234b164007e189b76bad31bd08102b23"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:43.000000Z"/>
+<entry
+   committed-rev="9"
+   name="jaxb-libs.jar"
+   text-time="2005-06-29T06:16:41.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="ed6a1fb0f9551d8c7768b83104c2d137"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:06:40.000000Z"/>
+<entry
+   committed-rev="190"
+   name="xercesImpl.jar"
+   text-time="2005-07-06T17:34:00.000000Z"
+   committed-date="2005-07-06T17:33:07.340763Z"
+   checksum="53c0a04a4efb20d52249155a312e91d9"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T17:33:44.000000Z"/>
+<entry
+   committed-rev="9"
+   name="dom.jar"
+   text-time="2005-06-29T06:16:41.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="5be2619706b95e66e3dd079e4d88b675"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:09:26.000000Z"/>
+<entry
+   committed-rev="9"
+   name="jax-qname.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="ec67e87eebc33e7eeb810dba0bd189d6"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:09:26.000000Z"/>
+<entry
+   committed-rev="182"
+   name="jaxfront-core.jar"
+   text-time="2005-07-04T22:55:49.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="83474e13c8baa9d5d023c808fbb218da"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:45.000000Z"/>
+<entry
+   committed-rev="182"
+   name="commons-httpclient-2.0.1.jar"
+   text-time="2005-07-04T22:55:49.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="e70f3b737399c889c7e41662940a812e"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:46.000000Z"/>
+<entry
+   committed-rev="182"
+   name="jgoodiesLF.jar"
+   text-time="2005-07-04T22:55:49.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="cf1c848af6247ddcd3a025690b4acd5e"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:47.000000Z"/>
+<entry
+   committed-rev="9"
+   name="xsdlib.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="291bb63768e11e226a43fc862f512731"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:09:51.000000Z"/>
+<entry
+   committed-rev="78"
+   name="junit.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="1f40fb782a4f2cf78f161d32670f7a3a"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:10:02.000000Z"/>
+<entry
+   committed-rev="190"
+   name="xml-apis.jar"
+   text-time="2005-07-06T17:34:00.000000Z"
+   committed-date="2005-07-06T17:33:07.340763Z"
+   checksum="2651f9f7c39e3524f3e2c394625ac63a"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T17:33:46.000000Z"/>
+<entry
+   committed-rev="182"
+   name="jaxfront-dbm.jar"
+   text-time="2005-07-04T22:55:49.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="9e5682e217a7fc7ad2470ffab40aa900"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:47.000000Z"/>
+<entry
+   committed-rev="9"
+   name="sax.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="3c92225e524b506be905defb709eb2ed"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:10:13.000000Z"/>
+<entry
+   committed-rev="9"
+   name="jaxb-api.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="687dab1ff4eadf366347146d14fe49ac"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:10:15.000000Z"/>
+<entry
+   committed-rev="9"
+   name="relaxngDatatype.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-03-29T20:14:19.363718Z"
+   checksum="44f0c3031119a9d50204e9b5ffc396ee"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:10:15.000000Z"/>
+<entry
+   committed-rev="182"
+   name="commons-beanutils.jar"
+   text-time="2005-07-04T22:55:49.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="3c772fd621f0390c172cbc6ac069609e"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:48.000000Z"/>
+<entry
+   committed-rev="182"
+   name="commons-logging.jar"
+   text-time="2005-07-04T22:55:49.000000Z"
+   committed-date="2005-07-01T15:31:15.782315Z"
+   checksum="db8c34212cd072f81ef543a07548c1c1"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:55:47.000000Z"/>
+<entry
+   committed-rev="190"
+   name="resolver.jar"
+   text-time="2005-07-06T17:34:00.000000Z"
+   committed-date="2005-07-06T17:33:07.340763Z"
+   checksum="39546d6a7f9cf0fd971874d43214dbe4"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T17:34:00.000000Z"/>
+<entry
+   committed-rev="78"
+   name="jcommon-1.0.0-pre2.jar"
+   text-time="2005-06-29T06:16:42.000000Z"
+   committed-date="2005-05-16T18:47:03.697886Z"
+   checksum="41c6b8853f5d9caa7fb5f94fd1625503"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-29T06:10:34.000000Z"/>
+</wc-entries>

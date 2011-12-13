@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="163"
+   name=""
+   committed-date="2005-06-15T16:42:56.422785Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/lexicons"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="141"
+   name="biglex901.jt"
+   text-time="2005-06-29T05:56:45.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="ba311d77b31813771a39f1ffea211871"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="biglex_lr_^a.jt"
+   text-time="2005-06-29T05:56:45.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="5f7bfaa820aa230937442851507a19da"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="biglex_lr.jt"
+   text-time="2005-06-29T05:56:45.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="98ee6295ff2fd4483591771b85ec892f"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="sevenlex.jt"
+   text-time="2005-06-29T05:56:46.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="684cc3fcbc3667ea6598a6a3ac5d23d5"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="slex_pairs.jt"
+   text-time="2005-06-29T05:56:46.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="bf0b780b8210c445aa7018e95bc780ab"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="initial_lexicon.jt"
+   text-time="2005-06-29T05:56:46.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="55d573dbfcf0a8e0cf55e3e6dbb431b2"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="slex.jt"
+   text-time="2005-06-29T05:56:46.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="68af735bbabd7ba783c3c7f42b869f08"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+<entry
+   committed-rev="141"
+   name="context_lex.jt"
+   text-time="2005-06-29T05:56:46.000000Z"
+   committed-date="2005-06-08T19:16:39.926241Z"
+   checksum="c3db0000c11453c94ea82fd339e3b72f"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:45.000000Z"/>
+</wc-entries>

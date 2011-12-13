@@ -1,0 +1,146 @@
+Welcome to jTRACE!
+
+To get started quickly, click on "1. First Try" and explore the simulation panel.
+If you get stuck, you can click on the "Start" tab in the upper-left corner to 
+return here for instructions and reference information.
+
+1. About jTRACE 
+2. Instructions on usage 
+3. About the pre-loaded simulations 
+4. Theoretical notes: how to interpret the figures 
+5. References 
+6. Credits 
+
+----- 
+
+1. About jTRACE 
+
+TRACE is a highly influential model in the field of spoken word recognition.  Spoken word 
+recognition is a branch of psycholinguistics (psychology of language) that studies how
+people recognize spoken words in isolation and as part of complete utterences.  Basically,
+when you are listening to someone speak, how are you able to instantly recognize every 
+word they are saying?  It is such an effortless process that introspection offers few clues
+as to what is going on.  Understanding that process is the general problem in the field
+of spoken word recognition.
+
+In 1986, James McClelland and Jeff Elman proposed TRACE as a formal model of spoken word
+recognition.  In their seminal paper, they tell of how they created a 
+computer program that was an implementation of the TRACE model and ran dozens of "simulations" 
+comparing TRACE's behavior to human behavior.  It turned out that TRACE's behavior matched
+human behavior in several important ways, and thus they argued that the theories underlying
+the model are a good way to approach the problem of spoken word recognition.  In the next
+few paragraphs I will expand on what these simulations are all about, what are the main
+aspects of the model, and what are the key theoretical claims being made by TRACE.
+
+From now on, we'll be calling the program created by McClelland & Elman 'cTRACE' because it 
+was coded in the C programming language, in contrast to this program that was coded in java.
+
+
+A TRACE simulation in cTRACE is created when a combination of parameter settings 
+and subsequently execute the interactive
+activation algorithm for a preset number of cycles, then observe the program's output.  The 
+significance of a simulation is that the parameter settings model the state of a human 
+listener as well as an acoustic stimuli that they experience over a short span of time 
+(e.g. one second).  The output of the model, what we'll be calling phoneme and word 
+activations, model
+
+ 
+----- 
+
+2. Instructions on usage 
+
+The principle functions of the program are: set up Trace simulations, run the simulations,
+display the simulation data, do Luce Choice Rule analysis on the simulation data, compare 
+data sets from two seperate simulations, save/load simulation data. 
+
+To get started right away a number of simulations have been prepared based on the SWR 
+literature.  Simply select one from the toolbar above and click 'simulate'.  The parameters
+corresponding to the simulation will be loaded into the parameters panel, and a simulation
+panel will open.  Using the simulation panel is explained below.
+
+
+SETUP PANEL
+
+To set up a custom simulation, simply open the setup panel, set the parameters in the 
+parameters table and press the 'simulate!' button.   
+
+The tool bar contains several useful features: 
+'save parameters' and 'load parameters' use XML files to store the information from the 
+parameters table.
+
+'load simulation data' loads previously generated simulation data into a simulation panel.
+
+'load lexicon' loads a lexicon from an XML file.
+
+'reset parameters' resets the table values to those in the default column.
+
+
+SIMULATION PANEL
+
+Once you have opened a simulation panel, use the arrow and play buttons on the lower right to
+cycle through the simulation data which is display in the input, feature, phoneme and word 
+activation graphs.  The phoneme and word graphs have two display types, which can be toggled 
+using the '~ph graph' and '~wd graph' buttons, respectively.  The 'New Input' button and
+text field below it allow you to update the pseudo-acoustic input to the Trace model.  Similarly,
+the '>> Input' and '<< Input' buttons allow you to cycle amongst the comma-seperated inputs
+specified in the simulation setup.
+
+Important Note: Always remember that when saving, comparing and analyzing simulation data, the
+program only uses data which it has generated so far.  For example, if you have cycled the 
+simulation up to time increment 34, then jTRACE will use time increment 0 through 34 when
+executing  the save, compare and analyze functinos.
+
+The toolbar contains useful features: 
+'load data' loads simulation data from a previously run simulation.
+
+'save data' saves simulation data that you can reload later on.
+
+'save image' saves the current activation graphs as a BMP image file. (not implemented)
+
+'simulation comparison' allows you to compare two simulations, either the current one
+
+and one loaded from files, or two saved simulations.  Comparing two simulations here just 
+means taking the absolute difference between the two sets of data.  It is your 
+responsibility to make sure the word data is parallel in the two data sets.
+'Luce Choice Rule (LCR) analysis' opens an LCR analysis panel with the current simulation
+data as the basis for analysis.  Instructions for using the LCR panel are below.
+
+'turn ON/OFF simulation display' turning off the simulation display speeds up processing
+on the model.  This is useful if you do not need to watch the simulation unfold, for example 
+if you just want to generate the simulation data for LCR analysis.
+
+
+LUCE CHOICE RULE ANALYSIS PANEL
+
+This panel graphs LCR analysis.  See section 4 for theoretical background.
+Using the parameter bar on the left, you have a lot of flexibility over how
+data is computed and displayed. 
+
+The top drop-down bar let's you choose to consider phoneme or word data.
+
+The 'from # to #' inputs let you narrow the time increment range you wish to consider.
+
+The two central lists and the add/remove buttons below allow you to choose what words or
+phonemes you wish to consider in your LCR analysis.
+
+The text field below this allows you to customize the graph title, in case you intend to
+use the graph in a report or publication.
+
+In the box at lower-left are two options regarding how the LCR values are calculated.
+Please see section 4 for an explanation of the distinction between 'averaging' and 'max_align'
+and for an explanation of the distinction between 'normal attention' and 'forced choice attention'.
+
+The 'Graph it!' button will draw any changes to the graph which have not been done automatically.
+
+The functions in the toolbar are self explanatory.
+
+
+
+3. About the pre-loaded simulations 
+
+4. Theoretical notes: how to interpret the figures 
+
+5. References 
+
+6. Credits 
+

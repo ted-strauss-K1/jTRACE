@@ -1,0 +1,760 @@
+/*
+ * TraceNet.java
+ *
+ * Created on April 16, 2004, 5:18 PM
+ */
+ 
+package edu.uconn.psy.jtrace.Model;
+import java.util.*;
+
+/**
+ * @author  Rafi & Ted 
+ *
+ *  The code implementing the TRACE model is located in this class.
+ *  Many of the instance variables are stored in TraceParam.
+ *  This class is responsible for computing one processing cycle at a time,
+ *  wherein an entire simulation consists of multiple cycles. TraceSim
+ *  is responsible for cycling this class and storing the data that results.
+ *
+ *  In order to quantitatively replicate the original TRACE model's performance,
+ *  the original C code has been copied as closely as possible.  We have even 
+ *  retained some bizarre variable names in case anyone wants to refer to the 
+ *  original code.  If there are bugs in the C code, they have been replicated 
+ *  here.  Comments throughout attempt to clarify the flow of activation values.
+ *  
+ */
+public class TraceNet {
+    private int nwords; //number of words, calculated from the lexicon
+    private int inputSlice = 0; //
+    private double inputLayer[][], featLayer[][], phonLayer[][], wordLayer[][]; //current activation values
+    private double featNet[][], phonNet[][], wordNet[][]; //used during processing to store intermediate states
+    private int fSlices, pSlices, wSlices; //width of arrays (number of slices)
+    double phonarr[][][]; //phoneme representations, fetched from TracePhones
+    private TracePhones pd = null; //phoneme representations
+    private TraceParam tp = null; //parameters for this net
+    private TraceError terr = null;
+    private double pOverlap;        //holds the overlap between instances of phoneme detectors, similar to <NPNODESp,ps>
+    private double pww[][], wpw[][], pfw[][][], fpw[][][]; //represents the extent to which a unit can activate a non-overlapping unit on a different layer.
+    private double wpdur = 2; //constant replicated cTrace
+    private double pdur = 2; //constant replicated from cTrace
+    
+    private edu.uconn.psy.jtrace.Model.GaussianDistr stochasticGauss; //gaussian noise applied to processing layers
+    private edu.uconn.psy.jtrace.Model.GaussianDistr inputGauss; //gaussian noise applied to input representation
+    
+    /** Creates a new instance of TraceNet */
+    public TraceNet(TraceParam tp) {
+        terr = new TraceError();
+        if(tp == null){
+            terr.report("Fatal Error: TraceParam = null passed to TraceNet");
+            return; //fatal error
+        }
+        this.tp = tp;
+        
+        reset();
+        
+        
+    } 
+    //public TraceNet(){this(new TraceParam());}
+    
+    /**
+     * Resets the net to its initial state, using the existing parameters.
+     */
+    public void reset()
+    {
+        inputSlice = 0;
+        
+        //freqNode = tp.getFreqNode();
+        if(tp.getNoiseSD()!=0)  inputGauss=new edu.uconn.psy.jtrace.Model.GaussianDistr(0.0, tp.getNoiseSD());
+        if(tp.getStochasticitySD()!=0) stochasticGauss=new edu.uconn.psy.jtrace.Model.GaussianDistr(0.0, tp.getStochasticitySD());
+        
+        nwords = tp.getNWords();
+        fSlices = tp.getFSlices();
+        pSlices = fSlices / tp.getSlicesPerPhon(); 
+        wSlices = pSlices; //currently word slices and phoneme slices are aligned 1:1
+        inputLayer = new double[TracePhones.NFEATS*TracePhones.NCONTS][fSlices];
+        featLayer = new double[TracePhones.NFEATS*TracePhones.NCONTS][fSlices];
+        featNet = new double[TracePhones.NFEATS*TracePhones.NCONTS][fSlices];        
+        phonLayer = new double[TracePhones.NPHONS][pSlices];
+        phonNet = new double[TracePhones.NPHONS][pSlices];
+        wordLayer = new double[nwords][wSlices];
+        wordNet = new double[nwords][wSlices];
+        pd = new TracePhones();
+        
+        pww = new double[pd.NPHONS][4];
+        wpw = new double[pd.NPHONS][4];        
+        fpw = new double[pd.NPHONS][pd.NCONTS][];
+        pfw = new double[pd.NPHONS][pd.NCONTS][];        
+        
+        for(int p=0;p<pd.NPHONS;p++)
+            for(int c=0;c<pd.NCONTS;c++){        
+                fpw[p][c]= new double[tp.getSpread()[c]*2];
+                pfw[p][c]= new double[tp.getSpread()[c]*2];
+            }        
+        // if there is a phoneme continuum defined in the parameters, create it here.
+        if(tp.getContinuumSpec().trim().length()==3){
+            int step=(new Integer(new Character(tp.getContinuumSpec().trim().charAt(2)).toString())).intValue();
+            if(step>1&&step<10)
+                try
+                {
+                    pd.makePhonemeContinuum(tp.getContinuumSpec().trim().charAt(0),tp.getContinuumSpec().trim().charAt(1),step);
+                }
+                catch (TraceException te)
+                {
+                    System.out.println("Problems in makePhonemeContinuum");
+                }
+        }
+        
+        try {
+            pd.spreadPhons(tp.getSpread(), tp.getSpreadScale(), tp.getMin(), tp.getMax());
+        }
+        catch(TraceException td) {
+            report(td.getMessage());
+            return;
+        }
+        
+        //init feature layer to resting value
+        double rest;
+        rest = tp.clipWeight(tp.getRest().F);
+        for(int fslice = 0 ; fslice < fSlices; fslice++)
+            for(int feat = 0 ; feat < pd.NCONTS * pd.NFEATS ; feat++)
+                featLayer[feat][fslice] = rest;
+        
+        //init phon layer to resting value
+        rest = tp.clipWeight(tp.getRest().P);
+        for(int slice = 0; slice < pSlices; slice++)
+            for(int phon = 0; phon < TracePhones.NPHONS; phon++)
+                phonLayer[phon][slice] = rest;          
+        
+        //init word layer to resting value
+        //Original frequency implementation from cTRACE is being dropped: 
+        //  wp->base = rest[W] + fscale*log(1. + wordfreq[i]);
+        rest = tp.clipWeight(tp.getRest().W);
+        for(int wslice = 0; wslice < wSlices; wslice++)
+            for(int word = 0; word < nwords; word++){
+                wordLayer[word][wslice] = rest;                                
+            }
+        //frequency applied to the resting level of lexical items
+        if(tp.getFreqNode().RDL_rest_s != 0){
+            for(int wslice = 0; wslice < wSlices; wslice++)
+                for(int word = 0; word < nwords; word++){
+                    if(tp.getDictionary().get(word).getFrequency()>0)
+                        wordLayer[word][wslice]+= tp.getFreqNode().applyRestFreqScaling(tp.getDictionary().get(word));                                
+                }
+        }
+                
+        double d, dist;
+        int spread[] = tp.getSpread();
+        pOverlap = tp.getMaxSpread() / tp.getSlicesPerPhon();        
+        
+        double denom=0;
+        double ft;
+        // from C code: tdur = (float)(PWIDTH + POVERLAP)*pp->wscale/FPP = (((6+6)*1)/3)=4
+        double tdur = 4; 
+        
+        //calculate the pww and wpw arrays.
+        //how much can a phoneme at slice 4 activate a word at slice 5?
+        //the pww array contains scalars stating how much to scale down per offset slices.
+        //the wpw array is the same idea, except for w->p connections.
+        for(int phon = 0; phon < pd.NPHONS; phon++){
+                denom = 0;
+                for(int pslice = 0; pslice <= 4; pslice++){
+                    ft =  ((tdur - Math.abs(2 - pslice))/ tdur);
+                    denom += ft * ft;
+                }        
+                for(int pslice = 0; pslice < 4; pslice++){
+                    ft =  ((tdur - Math.abs(2 - pslice))/ tdur);
+                    pww[phon][pslice] = ft / denom;
+                    wpw[phon][pslice] = (1 * ft) / denom;                     
+                }                
+        }
+        
+        //calculate fpw, pfw 
+        //how much can a feature influence a phoneme if there are mis-aligned.
+        //these arrays state how much to scale down per offset slice.
+        int spr, ispr;
+        ft=0;
+        for(int phon = 0; phon < pd.NPHONS; phon++){            
+            for(int cont = 0; cont < pd.NCONTS; cont++){
+                denom=0;
+                spr=tp.getSpread()[cont]*1; //1 is stand in for pp->wscale (?)
+                ispr=spr;
+                for(int fslice=0;fslice < 2*ispr;fslice++){
+                    ft = (double)(((double)spr - Math.abs((double)ispr -(double)fslice))/(double)spr);
+                    denom += ((double)ft * (double)ft);
+                }
+                for(int fslice=0;fslice < 2*ispr;fslice++){
+                    pfw[phon][cont][fslice] = (double)(((double)spr - Math.abs((double)ispr - (double)fslice))/(double)spr);
+                    fpw[phon][cont][fslice] = (double)pfw[phon][cont][fslice] * (double)(1/denom);                                        
+                }                
+            }            
+        }        
+    }
+    
+    /** Create the input layer
+     *  loop through all the phonemes, and copy the corresponding features to it.
+     *  the offset for the phoneme should be used inorder to center
+     **/
+    
+    /** Variables which have been left out from original trace, M&E did not use them:
+     *  WEIGHTp(i),c,fs   STRENGTHp(i)   PEAKp(i)   SUSp(i)   RATEp(i)
+     **/
+    //converts the model input into a pseudo-spectral input representation, store in inputLayer
+    public void createInput(String phons)
+    {
+        //create the input layer.
+        int phon, maxwidth, slice = 0, inputOffset, phonOffset;
+        int i,t,cont;
+        int deltaInput = tp.getDeltaInput();
+        slice += deltaInput; //attempt to fix something.
+        double phonSpread[][][] = pd.getPhonSpread(); //fetch phoneme representations, may contain ambiguous phonemes.
+        // loop over phoneme input. go to next phoneme and step 6 slices. until the end of the input is reached or 
+        // FSLICES is reached
+        for(i = 0; (i < phons.length()) && (slice < fSlices); i++, slice += deltaInput) 
+        {
+            phon = TracePhones.mapPhon(phons.charAt(i));
+            inputOffset = slice - pd.getOffset();
+            //copy the spread phonemes onto the input layer (aligned correctly)
+            for(t=inputOffset, phonOffset = 0; t < inputOffset + pd.getOffset()*2; t++, phonOffset++)
+                for(cont = 0; cont < pd.NFEATS * pd.NCONTS; cont++)
+                    if(t >= 0 && t < fSlices){
+                        inputLayer[cont][t] += phonSpread[phon][cont][phonOffset];                         
+                    }
+        }
+        //apply input noise here.
+        if(tp.getNoiseSD()!=0d){ 
+            for(int feat = 0; feat < pd.NCONTS*pd.NFEATS; feat++)
+                for(int islice = 0; islice < fSlices; islice++){
+                    inputLayer[feat][islice] += inputGauss.nextGauss();
+                }
+        }
+        //make sure the input did not go out of bounds.
+        for(int feat = 0; feat < pd.NCONTS*pd.NFEATS; feat++)
+                for(int islice = 0; islice < fSlices; islice++){
+                    inputLayer[feat][islice] = tp.clipWeight(inputLayer[feat][islice]);
+                }
+        //the next line copies one column of data, forcing the _feature layer_ to undergo one cycle immediately. 
+        //this compensates for a discrepency between jTrace and cTrace; keeps things lined up.                
+        initialSlice(); 
+    }
+    
+    public double[][][] cycle() {                
+        //order of operation is critical here
+        act_features();
+        featToPhon();
+        phonToPhon();
+        //phonToFeat();  //not yet implemented correctly; no one has ever been interested in this aspect.
+        phonToWord();
+        wordToPhon();
+        wordToWord();
+        featUpdate();
+        phonUpdate();
+        wordUpdate();                   
+        
+        inputSlice += tp.getNReps(); //nrep steps in a cycle
+        //array boundary check
+        if(inputSlice >= fSlices) 
+            inputSlice = fSlices-1;
+        double D[][][]={wordLayer,featLayer,phonLayer,inputLayer};         
+        return D;
+    }
+    
+    //this method compensates for a small difference between jTrace and cTrace.
+    //it is called during initialization
+    public void initialSlice(){
+        for(int c = 0;c < TracePhones.NCONTS; c++)
+            for(int f = 0;f < TracePhones.NFEATS; f++)
+                featNet[(c*TracePhones.NFEATS)+f][0]+=inputLayer[(c*TracePhones.NFEATS)+f][0];                   
+        featUpdate();
+        
+    }
+    
+    //variable names taken from cTRACE.
+    //input-to-feature activation, AND feature-to-feature inhibition.
+    public void act_features(){
+        double[][] fsum=new double[TracePhones.NCONTS][fSlices]; //sum of prev slice's positive activations summed over each continuum at each fslice        
+        double[][] ffi=new double[TracePhones.NCONTS][fSlices]; //ff=[c][i]=fsum[c][i]*Gamma.F
+        //computes total inhibition coming from a continuum to each node at that time slice
+        for(int c = 0;c < TracePhones.NCONTS; c++)  
+            for(int f = 0;f < TracePhones.NFEATS; f++)
+                for(int fslice= -1;fslice < fSlices-1; fslice++)
+                    if(featLayer[(c*TracePhones.NFEATS)+f][fslice+1] > 0)
+                        fsum[c][fslice+1] += featLayer[(c*TracePhones.NFEATS)+f][fslice+1];
+        //this block scales down the fsum value by Gamma.F
+        for(int c = 0;c < TracePhones.NCONTS; c++) 
+            for(int fslice= -1;fslice < fSlices-1; fslice++)
+                   ffi[c][fslice+1] = fsum[c][fslice+1] * tp.getGamma().F;        
+        //this block copies input activations to the feature layer
+        if(inputSlice < fSlices) 
+            for(int fIndex = 0;fIndex < TracePhones.NCONTS*TracePhones.NFEATS; fIndex++)
+                for(int fslice = inputSlice; (fslice < fSlices-1) && (fslice < inputSlice + tp.getNReps()); fslice++) //small variation from original
+                    featNet[fIndex][fslice+1] += tp.clipWeight(tp.getAlpha().IF * inputLayer[fIndex][fslice+1]); //input->feature activation
+        //this block applies ffi inhibition to each node in the featue layer, and compensates for self-inhibition
+        for(int c = 0;c < TracePhones.NCONTS; c++) 
+            for(int f = 0;f < TracePhones.NFEATS; f++)
+                for(int fslice= -1;fslice < fSlices-1; fslice++)
+                    if((ffi[c][fslice+1] - (featLayer[(c*TracePhones.NFEATS)+f][fslice+1]*tp.getGamma().F)) > 0) 
+                        featNet[(c*TracePhones.NFEATS)+f][fslice+1] -= (ffi[c][fslice+1] - Math.max(0,(featLayer[(c*TracePhones.NFEATS)+f][fslice+1]*tp.getGamma().F)));                            
+    }    
+    //feature to phoneme activations
+    public void featToPhon(){
+        int fspr, fmax, pstart, pend, winstart, c;
+        double t;
+        int FPP = tp.getSlicesPerPhon();
+        //for every feature at every slice, if the units activation is above zero,
+        //then send activation to phonNet from the featLayer scaled by PhonDefs, 
+        //spread, fwp and alpha.
+        for(int featIndex=0;featIndex<pd.NCONTS*pd.NFEATS;featIndex++){
+            for(int fslice=0;fslice<fSlices;fslice++){
+                if(featLayer[featIndex][fslice]>0){
+                    //for all phonemes affected by the current feature.
+                    //C code appears to ignore the first phoneme affected by feat (why?)
+                    for(int phon=0;phon<pd.NPHONS;phon++){
+                        //if the phoneme definition is blank here continue.
+                        if(pd.PhonDefs[phon][featIndex]==0) continue;
+                        //determine, based on current slice and spread, what range of
+                        //phoneme units to send activation to.
+                        fspr = tp.getSpread()[featIndex/pd.NFEATS];
+                        fmax = fSlices - fspr;
+                        if(fslice < fspr){
+                            pstart = 0;
+                            pend = (fslice + fspr - 1)/FPP;                            
+                        }
+                        else{
+                            if(fslice > fmax) pend = pSlices - 1;
+                            else pend = (fslice + fspr - 1)/FPP;
+                            pstart = ((fslice - fspr)/FPP) + 1;
+                        }
+                        winstart = fspr - (fslice - (FPP*pstart));
+                        
+                        if(featLayer[featIndex][fslice] > 0) t = pd.PhonDefs[phon][featIndex] * featLayer[featIndex][fslice] * tp.getAlpha().FP;
+                        else t = 0;
+                        c = featIndex / pd.NFEATS;
+                        for(int pslice=pstart;pslice<(pend+1)&&pslice<pSlices;pslice++){                            
+                            phonNet[phon][pslice] += fpw[phon][c][winstart] * t; 
+                            winstart+=3;    
+                        }
+                    }
+                }
+            }
+        }        
+    }    
+    /** calculate inhibitions in phoneme layer **/
+    public void phonToPhon() {
+        double inhibition;
+        int ppeak, pmax, pmin, halfdur;
+        halfdur=1; 
+        double[] ppi=new double[pSlices];
+        //the ppi accumulates all of the inhibition at a particular phoneme slice.
+        //this amount of inhibition is later applied equally to all phonemes.        
+        for(int slice=0;slice<pSlices;slice++)
+            for(int phon=0;phon<TracePhones.NPHONS;phon++)
+                //if the phon unit has activation, determine its extent (does it hit an edge?) ...                
+                if(phonLayer[phon][slice]>0){
+                    pmax=slice+halfdur;
+                    if(pmax>=pSlices){
+                        pmax = pSlices-1;                    
+                        pmin=slice-halfdur; 
+                    }
+                    else{ 
+                        pmin=slice-halfdur; 
+                        if(pmin < 0)
+                            pmin=0;
+                    }
+                    //then add its activation to ppi, scaled by gamma.
+                    for(int i=pmin;i<pmax;i++)
+                        ppi[i]+=phonLayer[phon][slice]*tp.getGamma().P;                    
+                }
+        //now, determine again the extent of each phoneme unit,
+        //then apply inhibition equally to phons lying on the same phon slice.
+        for(int phon = 0; phon < pd.NPHONS; phon++){ //loop over phonemes (15)            
+            for(int slice = 0; slice < pSlices; slice++)  //loop over phoneme slices (original configuration 33)                
+            {
+                pmax=slice+halfdur;
+                if(pmax>=pSlices){
+                    pmax = pSlices-1;                    
+                    pmin=slice-halfdur; 
+                }
+                else{ 
+                    pmin=slice-halfdur; 
+                    if(pmin < 0)
+                        pmin=0;
+                }
+                for(int i=pmin;i<pmax;i++){
+                    //application of inhibition occurs here
+                    if(ppi[i]>0){
+                        phonNet[phon][slice]-=ppi[i];                        
+                    }
+                }
+                //here, we make up for self-inhibition, reimbursing nodes for inhibition that 
+                //originated from themselves.
+                if((phonLayer[phon][slice]*tp.getGamma().P)>0&&ppi[slice]>0){
+                    phonNet[phon][slice]+=((pmax-pmin)*phonLayer[phon][slice])*tp.getGamma().P;                    
+                }
+                
+            }            
+        }
+    }    
+    // feedback from phoneme to features - <PHONEXc,f,fs>
+    // This is always off in the original trace.
+    //TODO: this is not yet implemented correctly because it is never used.
+    public void phonToFeat() {
+        double activation;          
+        int d, fpp = tp.getSlicesPerPhon();
+        
+            for(int fslice = 0; fslice < tp.getFSlices(); fslice++)
+                for(int cont = 0; cont < pd.NCONTS; cont++ )  //loop over all continua (7)
+                    for(int feat = 0 ; feat < pd.NFEATS; feat++)
+                    {                
+                        activation = 0;  //activation is basically <PFEXp,ps,c,f,fs>
+                        for(int phon = 0; phon < pd.NPHONS; phon++) //loop over phonemes (15)
+                            for(int pslice = 0; pslice < tp.getPSlices(); pslice++)  //loop over phoneme slices (original configuration 33)
+                            {
+	                        d = (int)Math.abs(pslice * fpp - fslice);
+        	                if(d >= fSlices) d = fSlices - 1;
+                                    if(phonLayer[phon][pslice] > 0) //aLPHA connections=only excitatory
+                                        activation += pfw[phon][cont][d] * phonLayer[phon][pslice] * pd.PhonDefs[phon][cont * pd.NFEATS + feat];
+                            }
+                        featNet[cont * pd.NFEATS + feat][fslice] += tp.getAlpha().PF * activation;                    
+                    }
+    }     
+    //This implementation actually depends on pdur being 2, re: pww dynamics.
+    public void phonToWord() {
+        double excitation = 0;
+        edu.uconn.psy.jtrace.Model.TraceLexicon dict = tp.getDictionary();
+        String str;     
+        double t;
+        int wpeak, wmin, winstart, wmax, pdur, strlen;
+        //for each phoneme
+        for(int phon=0;phon<TracePhones.NPHONS;phon++){
+            pdur=2;
+            //and for each phoneme slice
+            for(int pslice=0;pslice<pSlices;pslice++){
+                //if the current unit is below zero, skip it.
+                if(phonLayer[phon][pslice]<=0) continue;   
+                //iterate over each word in the dictionary
+                words: for(int word=0;word<dict.size();word++){                    
+                    str = dict.get(word).getPhon();
+                    strlen = str.length();
+                    //for each letter in the current word
+                    for(int offset=0;offset<strlen;offset++){
+                        //if that letter corresponds to the phoneme we're now considering...
+                         if(str.charAt(offset)==pd.toChar(phon)){
+                             //then determine the temporal range of word units for which it
+                             //makes sense that the current phoneme should send activation to it.
+                             wpeak = pslice - (pdur * offset);
+                             if(wpeak< -pdur) continue words;
+                             wmin = 1 + wpeak - pdur; 
+                             if(wmin < 0){
+                                winstart = 1 - wmin;
+                                wmin = 0;
+                                wmax = wpeak + pdur;                                 
+                             }
+                             else{
+                                 wmax = wpeak + pdur; 
+                                 if(wmax > pSlices - 1)
+                                     wmax = pSlices - 1;
+                                 winstart = 1; 
+                             }
+                             //determine the raw amount of activation that is sent to the word units
+                             t = 2 * phonLayer[phon][pslice] * tp.getAlpha().PW; //the 2 stands for word->scale
+                             
+                             if(tp.getFreqNode().RDL_wt_s != 0){
+                               t = tp.getFreqNode().applyWeightFreqScaling(tp.getDictionary().get(word), t);                                
+                             }
+                             double _t;
+                             //now iterate over the temporal range determined about 15 lines above
+                             for(int wslice = wmin; wslice<wmax && wslice<wSlices; wslice++, winstart++)
+                                 if(winstart>=0 && winstart<4){
+                                     // scale the activation by lexical frequency, if that option is turned on.
+                                     //if(tp.getFreqNode().RDL_wt&&dict.get(word).getFrequency()>0){                                         
+                                     //   double wfrq =  tp.getFreqNode().RDL_wt_s  * ((double)Math.log((double)dict.get(word).getFrequency()) * 0.434294482);                                                                                
+                                     //   //scale activation by pww; this determines how temporal offset should affect excitation
+                                     //   wordNet[word][wslice] += ((1+wfrq) * pww[phon][winstart] * t);
+                                     //}
+                                     //if no freq
+                                     //else{
+                                         //scale activation by pww; this determines how temporal offset should affect excitation                                        
+                                         wordNet[word][wslice] += pww[phon][winstart] * t;
+                                     //}                                     
+                                 }
+                         }
+                    }
+                }
+            }
+        }        
+    }    
+    //word to word inhibition: operates the same as phoneme inhibition -- calculate
+    //the total amount of inhibition at each slice and apply that equally to all words
+    //that overlap with that slice somewhere.  this means that word length increases
+    //the amount of lexical inhibition linearly.  
+    public void wordToWord() {
+        double[] wwi=new double[pSlices];
+        double[] wisum=new double[pSlices];
+        edu.uconn.psy.jtrace.Model.TraceLexicon dict=tp.getDictionary();        
+        //for all word slices
+        for(int wstart=0;wstart<pSlices;wstart++){
+            //for all words
+            for(int word=0;word<nwords;word++){
+                //determine how many slices the current word lies on
+                int wmin=wstart; //wstart - (1/2 phone width))
+                if(wmin<0) wmin=0;
+                int wmax=wstart+(dict.get(word).getPhon().length()*2); //!! wstart + (wlength*phone width) + (1/2 phone width)
+                if(wmax>pSlices) wmax=pSlices-1;
+                for(int l=wmin;l<wmax;l++){
+                    //then add that word unit's activation to the wisum array,                    
+                    if(wordLayer[word][wstart]>0)
+                        wisum[l]+=wordLayer[word][wstart]*wordLayer[word][wstart];
+                }
+            }       
+        }
+        //next, scale the wisum array by gamma, and it is now called the wwi array.
+        //there is also a built-in ceiling here, preventing inhibition over 3.0d.
+        for(int wstart=0;wstart<pSlices;wstart++){
+            if(wisum[wstart] > 3.0d) wisum[wstart]=3.0d; 
+            wwi[wstart]= wisum[wstart]*tp.getGamma().W;            
+        }
+        //now, repeat the looping over words and slices and apply the inhibition
+        //accumulated at each slice to every word unit that overlaps with that slice.
+        for(int wstart=0;wstart<pSlices;wstart++){
+            for(int word=0;word<nwords;word++){
+                int wmin=wstart; //wstart - (1/2 phone width))
+                if(wmin<0) wmin=0;
+                int wmax=wstart+(dict.get(word).getPhon().length()*2); //!! wstart + (wlength*phone width) + (1/2 phone width)
+                if(wmax>pSlices) wmax=pSlices-1;
+                //inhibition applied in this loop.
+                for(int l=wmin;l<wmax;l++)
+                    wordNet[word][wstart]-=wwi[l]; //if(wwi[l]>0) //inhibition applied here                                        
+                //re-imbursement of self-inhibition occurs here.
+                if(wordLayer[word][wstart]>0)  //self-inhibitiopn prevented here.
+                    wordNet[word][wstart]+=((wmax-wmin)*(wordLayer[word][wstart]*wordLayer[word][wstart]*tp.getGamma().W));                                     
+            }
+        }        
+    }
+    //lexical to phoneme feedback.
+    public void wordToPhon() {
+        //initialize variables
+        double excitation = 0;
+        edu.uconn.psy.jtrace.Model.TraceLexicon dict = tp.getDictionary();
+        int strlen, phon;
+        String str;
+        int wslot, t_o_p, pmin, pwin, pmax, currChar; 
+        char t_c_p;
+        //for every word in the lexicon
+        for(int word = 0 ; word < dict.size(); word++){
+            //for each word slice
+            for(int wslice = 0; wslice < wSlices; wslice++){
+                //if the word has activation above zero
+                if(wordLayer[word][wslice]<=0) continue;
+                //determine what range of slices (for that word unit) can be
+                //fed back to the phoneme layer.
+                str = dict.get(word).getPhon();                
+                for(int wstart=0; wstart < str.length(); wstart++){
+                    t_c_p = str.charAt(wstart);
+                    currChar = pd.mapPhon(t_c_p);
+                    wslot = wslice + (wstart*2);
+                    pmin = wslot - 1; //??
+                    if(pmin >= pSlices) break;
+                    if(pmin < 0){
+                        pwin = 1 - pmin;
+                        pmin=0;
+                        pmax = wslot + 2;  //from +2                        
+                    }
+                    else{
+                        pmax = wslot + 2;  //from +2
+                        if ( pmax > pSlices - 1)
+			    pmax = pSlices - 1;                                                
+                        pwin = 1;                        
+                    }
+                    /*
+                     *FREQ EFFECT HERE:
+                     for ( pnexptr = &pp->nex[pmin], wtptr = &pp->wpw[pwin]; pnexptr < pmaxptr;) {
+                        *pnexptr++ += (1 + wp->wfrq) * (*wtptr++)*(*wpexptr);
+                      }
+                     **/
+                    
+                    //now that we know the range to iterator over, iterate over the appropriate phoneme slices
+                    for(int pslice = pmin ;pslice < pmax && pslice < pSlices && pwin<4; pslice++, pwin++){
+                        //this check makes sure that ambiguous phonemes do not feedback
+                        //is this the correct behavior?  you decide.
+                        if(currChar > 14 && currChar < 0){ 
+                            int contIdx;
+                            try{
+                                contIdx=(new Integer(tp.getContinuumSpec().toCharArray()[2])).intValue();
+                            } catch(Exception e){ e.printStackTrace(); contIdx=-1; }
+                            if(contIdx==-1){ 
+                                //there is something wrong with the input or the continuum.
+                                //feedback will not be calculated for this character.
+                                break;
+                            }       
+                            else{
+                               if(currChar==20){ //this is the bottom of the continuum.
+                                   currChar = pd.mapPhon(tp.getContinuumSpec().toCharArray()[0]);                                   
+                               }
+                               else if(currChar==(20+contIdx-1)){ //this is the top of the continuum
+                                   currChar = pd.mapPhon(tp.getContinuumSpec().toCharArray()[2]);                                   
+                               }
+                               else{ //in the middle of the continuum
+                                   //feedback will not be calculated for any ambiguous phonemes
+                                   break;
+                               }
+                            }
+                        }
+                        //if the current word activation is above zero
+                        if(wordLayer[word][wslice] > 0){
+                            //if lexical frequency is in effect.                            
+                            if(tp.getFreqNode().RDL_wt_s!=0&&dict.get(word).getFrequency()>0){
+                                double wfrq = tp.getFreqNode().RDL_wt_s  * (Math.log(0 + dict.get(word).getFrequency()) * 0.434294482);                
+                                //scale the activation by alpha and wpw
+                                phonNet[currChar][pslice] += (1 + wfrq) * wordLayer[word][wslice] * tp.getAlpha().WP * wpw[currChar][pwin]; 
+                            }
+                            //if there is no frequency in effect here
+                            else{
+                                //scale the activation by alpha and wpw
+                                phonNet[currChar][pslice] += wordLayer[word][wslice] * tp.getAlpha().WP * wpw[currChar][pwin]; 
+                            }                            
+                        }
+                    }
+                }                
+            }
+        }                      
+    }
+    //final processing of feature units incorporates stochasticity (if on) and
+    //implements decay to resting level behavior.
+    public void featUpdate() {
+        double diff, rest, t, tt;        
+        double min=tp.getMin();
+        double max= tp.getMax();
+        for(int slice = 0; slice < fSlices; slice++){
+            for(int feat = 0; feat < TracePhones.NFEATS*TracePhones.NCONTS; feat++ )
+            {   
+                if(tp.getStochasticitySD()!=0d){ //apply gaussian noise here
+                    featNet[feat][slice] += stochasticGauss.nextGauss(); //this adds the noise                    
+                }
+        
+                t = featLayer[feat][slice];
+                if(featNet[feat][slice] > 0)
+                    t+= (max-t)*featNet[feat][slice];                
+                else if(featNet[feat][slice] < 0)
+                    t += (t-min)*featNet[feat][slice];                    
+                tt = featLayer[feat][slice] - tp.getRest().F;
+                //if(t!=0)
+                t -= tp.getDecay().F * tt;
+                if(t > max) t = max;
+                if(t < min) t = min;
+                //final update for feature layer
+                featLayer[feat][slice] = t;                
+            }
+        }
+        featNet = new double[TracePhones.NFEATS*TracePhones.NCONTS][fSlices];                        
+    }    
+    
+    //final processing of phoneme units incorporates stochasticity (if on) and
+    //implements decay to resting level behavior.    
+    public void phonUpdate() {
+        double diff, rest;        
+        for(int pslice = 0; pslice < pSlices; pslice++)
+            for(int phon = 0; phon < TracePhones.NPHONS; phon++ )
+            {
+                if(tp.getStochasticitySD()!=0d){ //apply gaussian noise here
+                    phonNet[phon][pslice] += stochasticGauss.nextGauss(); //this adds the noise                    
+                }
+                
+                if(phonNet[phon][pslice] >= 0)
+                    diff = tp.getMax() - phonLayer[phon][pslice];
+                else
+                    diff =  phonLayer[phon][pslice] - tp.getMin();
+                
+                rest = phonLayer[phon][pslice] - tp.getRest().P;
+
+                //final update for phoneme layer 
+                phonLayer[phon][pslice] += (diff * phonNet[phon][pslice]) - (tp.getDecay().P * rest);
+                phonLayer[phon][pslice] = tp.clipWeight(phonLayer[phon][pslice]);                            
+            }
+        phonNet = new double[TracePhones.NPHONS][pSlices];        
+    }
+    
+    //final processing of word units incorporates stochasticity (if on) and
+    //implements decay to resting level behavior.    
+    public void wordUpdate(){            
+        double t, tt, max, min;
+        min=tp.getMin();
+        max= tp.getMax();
+        for(int word = 0; word < nwords; word++ )
+            for(int slice = 0; slice < wSlices; slice++){
+                if(tp.getStochasticitySD()!=0d){ //apply gaussian noise here
+                    wordNet[word][slice] += stochasticGauss.nextGauss(); //this adds the noise                    
+                }
+                
+                t = wordLayer[word][slice];
+                if( wordNet[word][slice] > 0)
+                    t += (max - t) * wordNet[word][slice];
+                else if( wordNet[word][slice] < 0)
+                    t += (t - min) * wordNet[word][slice];
+                //words decay to their resting points, which may be boosted by frequency.
+                if(tp.getFreqNode().RDL_rest_s!=0&&tp.getDictionary().get(word).getFrequency()>0)
+                    tt = wordLayer[word][slice] - (tp.getRest().W + tp.getFreqNode().applyRestFreqScaling(tp.getDictionary().get(word)));                
+                else
+                    tt = wordLayer[word][slice] - tp.getRest().W;
+                //if(tt != 0)
+                t -= tp.getDecay().W * tt;
+                if(t > max) t = max;
+                if(t < min) t = min;                
+                
+                //final update for word layer
+                wordLayer[word][slice] = t;
+            }
+        wordNet = new double[nwords][wSlices];        
+    }
+    public void gc(){
+        inputLayer=null;
+        featLayer=null;
+        phonLayer=null;
+        wordLayer=null;
+        featNet=null;
+        phonNet=null;
+        wordNet=null;        
+        pww=null;
+        wpw=null;
+        pfw=null;
+        fpw=null;
+    }
+    //Error Handling code
+    public void report(String report) {
+        terr.report(report);
+    }
+    public TraceParam getParameters(){return tp;}
+    public int getInputSlice(){return inputSlice;}    
+    public void setInputSlice(int i){inputSlice=0;}
+    public String toString(){return "this is an object of type TraceNet.";}
+    public boolean isReady(){return true;}
+    public String isReadyVerbose(){return " ready ... ";}    
+    public double[][] getInputLayer() {return inputLayer;}
+    public void setInputLayer(double[][] _l){inputLayer=_l;}
+    public double[][] getFeatureLayer() {return featLayer;}
+    public void setFeatureLayer(double[][] _l){featLayer=_l;}
+    public double[][] getPhonemeLayer() {return phonLayer;}
+    public void setPhonemeLayer(double[][] _l){phonLayer=_l;}
+    public double[][] getWordLayer() {return wordLayer;}
+    public void setWordLayer(double[][] _l){wordLayer=_l;}
+    public TracePhones getPhonDefs() {return pd;}
+    public double[][] getFeatLayer() {return featLayer;}
+    public double[][] getPhonLayer() {return phonLayer;}
+    public TraceParam getParam() {return tp;}
+    public double[][] clearArray(double[][] d){
+        for(int i=0;i<d.length;i++)
+            for(int j=0;j<d[0].length;j++)
+                d[i][j]=0d;
+        return d;
+    }
+    //rounds a double to the third significant digit
+    private double roundingOp(double x){
+        double y;
+        String str=(new Double(x)).toString();
+        if(str.length()<=5) return x;
+        if(x<0.001&&x>0.0005) return 0.001d;
+        if(x<0.0005) return 0.0d;
+        y=((new Double(str.substring(0,6))).doubleValue())*1000;
+        y=((double)Math.round((float)y))/1000;
+        return y;
+    }
+}

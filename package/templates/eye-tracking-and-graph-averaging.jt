@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jaxfront version=1.60;time=2005-07-13 01:53:40.95?>
+<jt xmlns="http://xml.netbeans.org/examples/targetNS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.netbeans.org/examples/targetNS Users\tedstrauss\SVN\jtrace\trunk\package\schema\jTRACESchema.xsd">
+   <description>Run 4 eye-tracking four-tuples (with the analysis defaults that are built in to the eye-tracking iterator) then generate the average graph for these 4 simulations.  Note how the labelsare created for the average graph.  Both a graph PNG file and CSV file are created using the average-all-analyses-in-current-iteration-and-save-graph action.</description>
+   <script>
+         <iterate>
+               <over-eye-tracking-four-tuples>
+                  <four-tuple>
+                     <target>bat^l</target>
+                     <competitor-one>badi</competitor-one>
+                     <competitor-two>babi</competitor-two>
+                     <competitor-three>dru</competitor-three>
+                  </four-tuple>
+                  <four-tuple>
+                     <target>karp^t</target>
+                     <competitor-one>kard</competitor-one>
+                     <competitor-two>kar</competitor-two>
+                     <competitor-three>babi</competitor-three>
+                  </four-tuple>
+                  <four-tuple>
+                     <target>d^b^l</target>
+                     <competitor-one>d^k</competitor-one>
+                     <competitor-two>dru</competitor-two>
+                     <competitor-three>slip</competitor-three>
+                  </four-tuple>
+                  <four-tuple>
+                     <target>list</target>
+                     <competitor-one>lip</competitor-one>
+                     <competitor-two>lig</competitor-two>
+                     <competitor-three>grup</competitor-three>
+                  </four-tuple>
+               </over-eye-tracking-four-tuples>
+            <instruction>
+               <action>
+                  <set-cycles-per-sim>
+                     <cycles>80</cycles>
+                  </set-cycles-per-sim>
+               </action>
+            </instruction>
+            <instruction>
+               <action>
+                  <add-silence-to-input-edges>
+                     <arg>n/a</arg>
+                  </add-silence-to-input-edges>
+               </action>
+            </instruction>
+            <instruction>
+               <action>
+                  <average-all-analyses-in-current-iteration-and-save-graph>
+                     <labels-for-averaged-graph>
+                        <text>target</text>
+                     </labels-for-averaged-graph>
+                     <labels-for-averaged-graph>
+                        <text>competitor 1</text>
+                     </labels-for-averaged-graph>
+                     <labels-for-averaged-graph>
+                        <text>competitor 2</text>
+                     </labels-for-averaged-graph>
+                     <labels-for-averaged-graph>
+                        <text>competitor 3</text>
+                     </labels-for-averaged-graph>
+                     <file>
+                           <relative-path>/temp</relative-path>
+                        <name>eyetrack_avg</name>
+                     </file>
+                  </average-all-analyses-in-current-iteration-and-save-graph>
+               </action>
+            </instruction>
+         </iterate>
+   </script>
+</jt>

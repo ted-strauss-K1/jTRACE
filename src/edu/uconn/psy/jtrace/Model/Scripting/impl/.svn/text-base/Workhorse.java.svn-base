@@ -1,0 +1,32 @@
+/*
+ * ActionWorkhorse.java
+ *
+ * Created on May 4, 2005, 4:45 PM
+ */
+
+package edu.uconn.psy.jtrace.Model.Scripting.impl;
+import edu.uconn.psy.jtrace.Model.*;
+import edu.uconn.psy.jtrace.Model.Scripting.*;
+/**
+ *
+ * @author tedstrauss
+ */
+public abstract class Workhorse {
+    edu.uconn.psy.jtrace.Model.TraceSim currSim;
+    edu.uconn.psy.jtrace.Model.TraceParam currParam;
+    edu.uconn.psy.jtrace.Model.TraceSimAnalysis currAnalysis;
+    edu.uconn.psy.jtrace.UI.GraphParameters currGraphParameters;
+    edu.uconn.psy.jtrace.Model.Scripting.TraceScript currScript;
+    /** Creates a new instance of ActionWorkhorse */
+    public Workhorse(edu.uconn.psy.jtrace.Model.TraceParam p, edu.uconn.psy.jtrace.Model.TraceSim s, edu.uconn.psy.jtrace.Model.TraceSimAnalysis g,edu.uconn.psy.jtrace.UI.GraphParameters gp,edu.uconn.psy.jtrace.Model.Scripting.TraceScript scr){
+        currParam=p;
+        currSim=s;
+        currAnalysis=g;
+        currGraphParameters=gp;
+        currScript=scr;
+    }
+    public void update(){
+        currSim = new TraceSim(currParam);
+        currSim.cycle(currScript.getCyclesPerSim());
+    }
+}

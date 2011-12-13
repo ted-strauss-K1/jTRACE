@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="200"
+   name=""
+   committed-date="2005-07-14T15:36:51.912321Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   name="gallery"
+   kind="dir"/>
+<entry
+   committed-rev="176"
+   name="LICENSE.txt"
+   text-time="2005-06-30T02:55:17.000000Z"
+   committed-date="2005-06-29T21:02:58.604160Z"
+   checksum="c2dc19e7e3a84f689857c950d44aa709"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-30T02:55:17.000000Z"/>
+<entry
+   name="schema"
+   kind="dir"/>
+<entry
+   committed-rev="200"
+   name="jtrace.sh"
+   text-time="2005-07-14T15:43:03.000000Z"
+   committed-date="2005-07-14T15:36:51.912321Z"
+   checksum="1b07562cdf48b7257cb6c5d8bcd7dc90"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T15:43:02.000000Z"/>
+<entry
+   name="lexicons"
+   kind="dir"/>
+<entry
+   name="docs"
+   kind="dir"/>
+<entry
+   name="libs"
+   kind="dir"/>
+<entry
+   committed-rev="190"
+   name="makepackage"
+   text-time="2005-07-06T17:34:00.000000Z"
+   committed-date="2005-07-06T17:33:07.340763Z"
+   checksum="b7a4b7d576414e839942b3f2690e6bb3"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-06T17:33:34.000000Z"/>
+<entry
+   committed-rev="176"
+   name="THIRDPARTYLICENSE.txt"
+   text-time="2005-07-12T22:15:36.000000Z"
+   committed-date="2005-06-29T21:02:58.604160Z"
+   checksum="1bfe28263d5044311959d27c9b7a79e6"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-06-30T02:55:17.000000Z"/>
+<entry
+   committed-rev="200"
+   name="jtrace.bat"
+   text-time="2005-07-14T15:43:03.000000Z"
+   committed-date="2005-07-14T15:36:51.912321Z"
+   checksum="ab1efa49072859d0f5f6a77868a3faf3"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T15:43:03.000000Z"/>
+<entry
+   name="templates"
+   kind="dir"/>
+</wc-entries>

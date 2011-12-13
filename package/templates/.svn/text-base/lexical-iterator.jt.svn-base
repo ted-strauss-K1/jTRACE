@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jaxfront version=1.60;time=2005-07-13 01:53:12.807;xui=jt.xui?>
+<jt xmlns="http://xml.netbeans.org/examples/targetNS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.netbeans.org/examples/targetNS Users\tedstrauss\SVN\jtrace\trunk\package\schema\jTRACESchema.xsd">
+   <description>Runs a simulation for every member of the lexicon.  Does not save any data or open any windows -- please add your own content!</description>
+   <script>
+         <iterate>
+               <over-items-in-a-lexicon>
+                  <use-the-current-lexicon>
+                     <target-parameter>modelInput</target-parameter>
+                  </use-the-current-lexicon>
+               </over-items-in-a-lexicon>
+            <instruction>
+               <action>
+                  <set-cycles-per-sim>
+                     <cycles>65</cycles>
+                  </set-cycles-per-sim>
+               </action>
+            </instruction>
+         </iterate>
+   </script>
+</jt>

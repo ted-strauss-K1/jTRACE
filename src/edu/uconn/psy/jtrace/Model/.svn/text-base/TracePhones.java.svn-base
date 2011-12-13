@@ -1,0 +1,597 @@
+package edu.uconn.psy.jtrace.Model;
+
+/**
+ * TracePhones defines TRACE phonemes, input representations, and ambiguous
+ * phonemes. 
+ * An instance of TracePhones can be created to create and refer to spread
+ * input representations and phoneme continua. The static methods can be used
+ * to get the list of valid phones and validate phoneme strings.
+ *
+ * Note that the phonDefs matrix contrains peak values for each phoneme. The
+ * phonSpread matrix and related code computes ramp-up and ramp-down activations
+ * for each phone.
+ * 
+ * @author Rafi Pelosoff
+ * @author Ted Strauss
+ * @author Harlan Harris
+ */
+public class TracePhones {
+    // constants
+    public static final int NPHONS = 15; //number of phonemes
+    public static final int NFEATS = 9;  //number of features
+    public static final int NCONTS = 7;  //number of values(continua) per feature
+    public static final int MAXSTEPS = 9;   // maximum number of steps in an ambiguous phone
+    //public static final String labels[]={"/p/", "/b/", "/t/", "/d/", "/k/", "/g/", "/s/", "/S/", "/r/", "/l/", "/a/", "/i/", "/u/", "/^/", "/-/"}; 
+    public static final String labels[]={"p", "b", "t", "d", "k", "g", "s", "S", "r", "l", "a", "i", "u", "^", "-"}; 
+    // phonDefs is defined at the end
+    
+    // having to do with phoneme spread
+    private double phonSpread[][][] = null; //new double [NPHONS][NFEATS*NCONTS][offset*2+1]
+    private double norm[] = null;   // normalizer for each spreaded phoneme sum_x(sum_y(pix(x,y)^2))
+    private int offset = 0;         // maximum spread
+    
+    // having to do with ambiguous phones
+    private double AmbiguousPhonDefs[][] = new double[MAXSTEPS][NFEATS * NCONTS];    
+    private char ambigFrom, ambigTo;    
+    private int numAmbiguousPhons = 0;   
+    
+    
+    
+    /** Constructor for TracePhones.  */
+    public TracePhones()
+    {}
+    
+    /** 
+     * Get some or all of the phonSpread matrix. Assumes (?!) that it's been
+     * created!
+     *
+     * @param phon      if present, just get that element of phonSpread
+     * @return          2-D or 3-D matrix of spread phoneme representations
+     */
+    public double[][][] getPhonSpread() {return phonSpread;}
+    public double[][] getPhonSpread(int phon) { 
+        if(phon < 0 || phon >= (20+numAmbiguousPhons) || (phon > NPHONS && phon < 20)) 
+            return null;
+        else 
+            return phonSpread[phon];    // TODO: this will fail if not initialized!
+    }
+    
+    /**
+     * Get normalization matrix. Assumes (?!) that it's been created!
+     *
+     * @param phon      which norm component to get
+     * @return          norm
+     */
+    public double getNorm(int phon) throws TraceException {
+        if(phon < 0 || phon >= (20+numAmbiguousPhons) || (phon > NPHONS && phon < 20)) 
+            throw new TraceException("Phoneme index out of bounds");            
+        else
+            return norm[phon];
+    }
+    
+    public int getOffset() {return offset;}
+    
+    public static int mapPhon(char feat)
+    {
+      switch(feat)
+      {
+        case 'p': return 0;
+        case 'b': return 1;
+        case 't': return 2;
+        case 'd': return 3;
+        case 'k': return 4;
+        case 'g': return 5;
+        case 's': return 6;
+        case 'S': return 7;
+        case 'r': return 8;
+        case 'l': return 9;
+        case 'a': return 10;
+        case 'i': return 11;
+        case 'u': return 12;
+        case '^': return 13;
+        case 'x': return 13; //same as ^
+        case '-': return 14;
+        case ' ': return 14;        
+//        case 'R': return 15;
+//        case 'L': return 16;
+        //place holders for phoneme continuum:
+        case '0': return 20;
+        case '1': return 21;
+        case '?': return 21;        //
+        case '2': return 22;
+        case '3': return 23;
+        case '4': return 24;
+        case '5': return 25;
+        case '6': return 26;        
+        case '7': return 27;        
+        case '8': return 28;        
+        default: return -1;
+      }
+    }
+    public char toChar(int idx)
+    {
+      switch(idx)
+      {
+        case 0: return 'p';
+        case 1: return 'b';
+        case 2: return 't';
+        case 3: return 'd';
+        case 4: return 'k';
+        case 5: return 'g';
+        case 6: return 's';
+        case 7: return 'S';
+        case 8: return 'r';
+        case 9: return 'l';
+        case 10: return 'a';
+        case 11: return 'i';
+        case 12: return 'u';
+        case 13: return '^'; //same as 'x'
+        case 14: return '-'; //same as ' '
+//        case 15: return 'R';
+//        case 16: return 'L';
+        //place holders for phoneme continuum
+        case 20: return '0';
+        case 21: return '1';
+        case 22: return '2';
+        case 23: return '3';
+        case 24: return '4';
+        case 25: return '5';
+        case 26: return '6';
+        case 27: return '7';
+        case 28: return '8';        
+        default: return ' ';
+      }
+    }    
+    
+    /**
+     * Determines if a string is a valid TRACE word or string. (At least one character,
+     * and all characters are valid characters.)
+     *
+     * @param tw    TRACE word
+     * @return      <code>true</code> if valid; <code>false</code> if not
+     */
+    public static boolean validTraceWord(String tw)
+    {
+        if (tw.length() != 0)
+        {
+            for (int i = 0; i < tw.length(); i++)
+            {
+                if (mapPhon(tw.charAt(i)) == -1)
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    /** Spreads the phonesmes over time according to the spread array. This
+     * should be run before a TraceSim is run, and after any change to the
+     * ambiguous phoneme information.
+     * 
+     * @param spread        spread[] in TraceParam
+     * @param scale         spreadScale[] in TraceParam
+     * @param min           min in TraceParam
+     * @param max           max in TraceParam
+     */
+    public void spreadPhons(int spread[], double scale[], double min, double max) throws TraceException
+    {
+        int spreadSteps, maxspread = 0;
+        double delta;
+        
+        if(spread.length != scale.length)
+            throw new TraceException("spread and scale parameters have different scale");
+        
+        //norm = new double[NPHONS];
+        // ambiguous phones start at #20, so allocate enough room for them
+        norm = new double[20+MAXSTEPS];
+        
+        // find the max spread (spread*scale) for all features and scale the spread
+        // values we received from our caller
+        for(int i = 0 ; i < spread.length; i++)
+        {
+            if (spread[i]*scale[i] > maxspread)
+                maxspread = (int)java.lang.Math.ceil(spread[i]*scale[i]);
+            
+            spread[i] = (int)(spread[i]*scale[i]);
+        }
+        
+        //allocate the table
+        //phonSpread = new double [NPHONS][NFEATS*NCONTS][maxspread*2+1]; //add one double for safer code
+        phonSpread = new double [20+MAXSTEPS][NFEATS*NCONTS][maxspread*2+1]; //add one double for safer code
+        
+        // save to private field for some reason
+        offset = maxspread; // middle of the phonSpread matrix, so we can iterate to 
+                            // left and right to ramp up and ramp down
+        
+        if(min<0) min = 0; //this appears to be how C trace is implemented.
+        
+        for(int phon = 0; phon < NPHONS; phon++) //loop over phonemes
+        {
+            norm[phon] = 0;
+            
+            for(int cont = 0; cont < NFEATS*NCONTS; cont++) //loop over continuoum
+                
+                if(PhonDefs[phon][cont] > 0)
+                {
+                    spreadSteps = cont/NFEATS;//maxspread;
+                    
+                    // delta is the amount to ramp up/down
+                    delta = ((PhonDefs[phon][cont]*max)-((PhonDefs[phon][cont]*min)))/(double) spread[spreadSteps];
+                        
+                    for(int i = 0; i < spread[spreadSteps]; i++)
+                    {
+                        // old code...
+                        //delta = (PhonDefs[phon][cont]-min)/(double) spread[spreadSteps];
+                        //phonSpread[phon][cont][offset+i] = PhonDefs[phon][cont] - delta * i;
+                        //phonSpread[phon][cont][offset-i] = PhonDefs[phon][cont] - delta * i;
+                        
+                        // compute spread
+                        phonSpread[phon][cont][offset+i] = (PhonDefs[phon][cont] * max) - (delta * i);
+                        phonSpread[phon][cont][offset-i] = (PhonDefs[phon][cont] * max) - (delta * i);
+                        // and normalization info
+                        norm[phon] +=   phonSpread[phon][cont][offset+i]*phonSpread[phon][cont][offset+i] + 
+                                        phonSpread[phon][cont][offset-i]*phonSpread[phon][cont][offset-i];
+                    }
+                }
+        }
+        
+        //loop over ambiguous phonemes too
+        // this is just like above, but with AmbiguousPhonDefs instead of phonDefs.
+        for(int phon = 20; phon < 20+numAmbiguousPhons; phon++) //loop over phonemes            
+        {
+            norm[phon] = 0;
+            for(int cont = 0; cont < NFEATS*NCONTS; cont++) //loop over continuoum
+            {
+                if (AmbiguousPhonDefs[phon-20][cont] > 0)
+                {
+                    spreadSteps = cont/NFEATS;//maxspread;
+                    
+                    delta = ((AmbiguousPhonDefs[phon-20][cont]*max)-((AmbiguousPhonDefs[phon-20][cont]*min)))/(double) spread[spreadSteps];
+                        
+                    for(int i = 0; i < spread[spreadSteps]; i++)
+                    {
+                        phonSpread[phon][cont][offset+i] = AmbiguousPhonDefs[phon-20][cont] - delta * i;
+                        phonSpread[phon][cont][offset-i] = AmbiguousPhonDefs[phon-20][cont] - delta * i;
+                        
+                        norm[phon] +=   phonSpread[phon][cont][offset+i]*phonSpread[phon][cont][offset+i] + 
+                                        phonSpread[phon][cont][offset-i]*phonSpread[phon][cont][offset-i];
+                    }
+                }
+            }
+        }
+    }
+
+    
+    //FOLLOWING CODE IS DEVOTED TO CREATING AND HANDLING AMBIGUOUS PHONEME
+    //CONTINUI.
+    
+    /**
+     * Resets the phoneme continuum. 
+     * 
+     */
+    public void clearPhonemeContinuum(){
+        AmbiguousPhonDefs = new double[9][63];
+        
+        numAmbiguousPhons = 0;
+        
+        //System.out.println("Phoneme continuum cleared.");
+    }
+    
+    /**
+     * Create in this object a phoneme continuum of the same format as the
+     * phonDefs matricies.
+     * Throws an exception if arguments are unreasonable.
+     * Be sure to run spreadPhons() after running this!
+     *
+     * @param from      one endpoint
+     * @param to        the other endpoint
+     * @param steps     the number of steps (2-9)
+     */
+    public void makePhonemeContinuum(char from, char to, int steps) throws TraceException
+    {
+        // sanity check
+        int _from = mapPhon(from);
+        int _to = mapPhon(to);
+        if (_from == -1 || _to == -1 || steps <= 1 || steps > MAXSTEPS)
+        {
+            throw new TraceException("invalid arguments to makePhonemeContinuum");
+            //return;
+        }
+        
+        // store local copies
+        this.ambigFrom=from;
+        this.ambigTo=to;
+        this.numAmbiguousPhons=steps;
+        
+        // incr is the size of the increment at each step of the continuum
+        double[] incr=new double[NFEATS*NCONTS];
+        for(int cont = 0; cont < NFEATS*NCONTS; cont++)
+            incr[cont]=(PhonDefs[_to][cont] - PhonDefs[_from][cont]) / (numAmbiguousPhons-1); 
+        
+        // now create the ambiguous phones
+        for (int i=0;i<numAmbiguousPhons;i++)
+        {            
+            //System.out.print("\n\n/*Step "+i+" between "+from+" and "+to+".*/");
+            
+            //loop over continuoum
+            for (int cont = 0; cont < NFEATS*NCONTS; cont++)
+            { 
+                //continuum value is calculated as ith step in cont difference between ambigFrom to ambigTo:
+                AmbiguousPhonDefs[i][cont] = PhonDefs[_from][cont] + (i * incr[cont]);
+                
+                //if(cont%NFEATS==0) System.out.print("\n");
+                //System.out.print(AmbiguousPhonDefs[i][cont]+",  ");
+            }
+        }
+        //System.out.println("Phoneme continuum made between /"+from+"/ and /"+to+"/.");
+    }
+    
+    /** 
+     * Returns the mean difference between the two TRACE phoneme representations.
+     *
+     * @param x     first phone character
+     * @param y     second phone character
+     * @return      the difference if both are valid characters; -1 otherwise
+     */
+    public double comparePhons(char x, char y){
+        int _x = mapPhon(x);
+        int _y = mapPhon(y);
+        
+        if (_x == -1 || _y == -1)
+            return -1;
+        
+        double result=0;
+        
+        for(int cont = 0; cont < NFEATS*NCONTS; cont++) //loop over continuoum
+            result += Math.abs( PhonDefs[_x][cont] - PhonDefs[_y][cont]);
+        
+        result /= NFEATS*NCONTS;       
+        
+        return result;
+    }   
+    
+    // define peak values of each feature/continuum.
+    public static final double PhonDefs[][] = {         
+/*p*/  {0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOI */
+	1  ,  .2 ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+
+/*b*/  {0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	.2 ,  1  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */ 
+
+/*t*/	{0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOI */
+	0  ,  0  ,  1  ,  .2 ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*d*/	{0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  .2 ,  1  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*k*/	{0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  , .1  , .3  ,  1. , .3  , .1   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  1  ,  .2 ,  0  ,  0   , 0 }, /* BUR */
+
+/*g*/	{0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  , .1  , .3  ,  1. , .3  , .1   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  .2 ,  1  ,  0  ,  0   , 0 }, /* BUR */
+       
+/*s*/  {0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	1. , .3  , .1  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*S*/  {0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  0  , .1  , .3  ,  1. , .3  , .1  ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+        
+/*r*/  {0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0. ,  .5 ,  1.  , 0 , /* DIF */
+        0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* GRD */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*l*/  {0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  .5  , 0 , /* DIF */
+        0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* ACU */
+	0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* GRD */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */      
+    
+/*a*/  {1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  ,  0  ,  0  , .1  , .3  ,  1   , 0 , /* ACU */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*i*/	{1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	1. , .3  , .1  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* ACU */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*u*/	{1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  ,  0  , .1  , .3  ,  1. , .3   , 0 , /* ACU */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+                
+/*^*/  {0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	0  ,  0  ,  0  ,  0  ,  0  , .1  , .3  ,  1   , 0 , /* ACU */
+	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+
+/*-*/  	{0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  , /* POW */
+	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  , /* VOC */
+	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  , /* DIF */
+	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  , /* ACU */
+	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  , /* GRD */
+	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  , /* VOI */
+	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  1.  },  /* BUR */
+
+        //L AND R AMBIGUITY VALUES FOR USE IN MCCLELLAND 1991 SOTCHASTICITY REPLICATION
+///*R*/  {0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+//	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0. ,  .5 ,  1.  , 0 , /* DIF */
+//	0  ,  0  ,  0  ,  0  ,  .25  ,  .50  ,  .75 ,  0   , 0 , /* ACU */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0   , 0 , /* CNS */
+//	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+//
+///*L*/  {0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+//	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+//        0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  .5  , 0 , /* DIF */
+//	0  ,  0  ,  0  ,  0  ,  .75 ,  .50  ,  .25,  0  , 0 , /* ACU */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0   , 0 , /* CNS */
+//	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BUR */
+        
+    //ORIGINAL L AND R VALUES USED IN MCCLELLAND 1991
+/*r*/	//{0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	//0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0. ,  .5 ,  1.  , 0 , /* DIF */
+        //0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* ACU */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0   , 0 , /* CNS */
+	//1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 } , /* BST */
+
+/*l*/	//{0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	//0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  .5  , 0 , /* DIF */
+        //0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* ACU */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0   , 0 , /* CNS */
+	//1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 } , /* BST */
+   
+//McClelland 1991 /a/ representation
+/*a*/	//{1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+        //1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* DIF */
+	//0  ,  0  ,  0  ,  0  ,  0  , .1  , .3  ,  1   , 0 , /* ACU */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* CNS */
+	//1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* BST */        
+                
+        //McClelland 1991 /^/ representation
+/*^*/	//{0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	//1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	//0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+	//0  ,  0  ,  0  ,  0  ,  0  , .1  , .3  ,  1   , 0 , /* ACU */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* CNS */
+	//1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 } , /* BST */
+
+/*$*/  	//{1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  , /* POW */
+	// 1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  , /* VOC */
+	// 1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  , /* DIF */
+	// 1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  , /* ACU */
+	// 1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  , /* GRD */
+	// 1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  , /* VOI */
+	// 1.  ,  1.  ,  1.,  1.  ,  1.  ,  1.  ,  1.  , 1. ,  1.  },  /* BUR */
+
+ // This is the ambiguous phoneme used by McClelland 1991, halfway tween l and r
+ /*L*/	//0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* POW */
+	//0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  .5 , .5   , 0 , /* DIF */
+        //0  ,  0  ,  0  ,  0  ,  .5 ,  .5 ,  .5 ,  0   , 0 , /* ACU */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0   , 0 , /* CNS */
+	//1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+	//0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* BST */
+ 
+ // /K/ has /g/ features for VOI.
+ /*K*/	//{0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* DIF */
+//	0  ,  0  ,  0  , .1  , .3  ,  1. , .3  , .1   , 0 , /* ACU */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+//	0  ,  1.  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 , /* VOI */
+//	0  ,  0  ,  0  ,  0  ,  1  ,  .2 ,  0  ,  0   , 0 }, /* BUR */
+// /G/ has /k/ features for BUR.
+/*G*/	//{0  ,  0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0   , 0 , /* POW */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* VOC */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1. ,  0   , 0 , /* DIF */
+//	0  ,  0  ,  0  , .1  , .3  ,  1. , .3  , .1   , 0 , /* ACU */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  1.  , 0 , /* GRD */
+//	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+//	0  ,  0  ,  0  ,  0  ,  1 ,  .2  ,  0  ,  0   , 0 }, /* BUR */
+        
+/*?*///   {0  ,  0  ,  0  ,  0  , 1.  ,  0  ,  0  , 0 ,  0  , /* POW */
+//	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,1. ,  0  , /* VOC */
+//	 0  , 1.  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  0  , /* DIF */
+//	 0  ,  0  ,  0  ,  0  ,  0  ,  0  , 1.  , 0 ,  0  , /* ACU */
+//	 0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,1. ,  0  , /* GRD */
+//	 0  , .5  ,  0  ,  0  ,  0  ,  0  ,  0  ,.5 ,  0  , /* VOI */
+//	 0.6, .6  ,  0  ,  0  ,  0  ,  0  ,  0  , 0 ,  0  }  /* BUR */
+        
+//{
+///*x same as ^*/	{0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 }, /* POW */
+//	{1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOC */
+//	0  ,  0  ,  0  ,  1. ,  0  ,  0  ,  0  ,  0   , 0 , /* DIF */
+//	0  ,  0  ,  0  ,  0  ,  0  , .1  , .3  ,  1   , 0 , /* ACU */
+//	0  ,  1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* GRD */
+//	1. ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 , /* VOI */
+//	0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0  ,  0   , 0 } /* BUR */
+//    }
+
+    };
+ 
+    /*
+    public static void main(String[] args){
+        char[] p1={'p', 'b', 't', 'd', 'k', 'g', 's', 'S', 'r', 'l', 'a', 'i', 'u', '^', '-'};     
+        char[] p2={'p', 'b', 't', 'd', 'k', 'g', 's', 'S', 'r', 'l', 'a', 'i', 'u', '^', '-'};     
+        for(int i=0;i<p1.length;i++){
+            System.out.print("\n");
+            for(int j=0;j<p2.length;j++){
+                String curr=new String((new Character(p1[i])).toString()+(new Character(p2[j])).toString());
+                System.out.print(comparePhons(p1[i],p2[j])+"  ");
+            }
+        }            
+    } 
+     */   
+}
+
+

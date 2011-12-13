@@ -1,0 +1,289 @@
+/*
+ * WordBoxSimGraph.java
+ *
+ * Created on May 11, 2005, 1:17 PM
+ */
+
+package edu.uconn.psy.jtrace.UI;
+
+import java.awt.*;
+import java.awt.geom.*;
+import java.text.DecimalFormat;
+import edu.uconn.psy.jtrace.Model.*;
+
+/**
+ *
+ * @author harlan
+ */
+public class WordBoxSimGraph extends WordSimGraph {
+    
+    private DecimalFormat form;
+    private Font fWord;
+    private FontMetrics fWordMetrics;
+    
+    private Color palette[]={Color.black, Color.red, Color.orange, Color.green,
+            Color.blue,Color.magenta, Color.darkGray, Color.darkGray, 
+            Color.darkGray, Color.darkGray};
+            
+    private int deltaInput;     // need to know how many time slices/phoneme
+    
+    /** Creates a new instance of WordBoxSimGraph */
+    public WordBoxSimGraph(TraceParam _tp, double [][] _d, int _n, int _i,
+            double _min, double _max, String [] _wl, int _di) 
+    {
+        super(_tp, _d, _n, _i, _min, _max, _wl);
+        
+        deltaInput = _di;
+        
+        yAxisLabel = "Activation Magnitude";
+        
+        // set up a formatter to display doubles
+        form = new DecimalFormat(".0");
+        
+        
+    }
+    
+    protected void getFixedSizes(Graphics g)
+    {
+        super.getFixedSizes(g);
+        
+        FontMetrics fm;
+        
+        fm = g.getFontMetrics(fTickLabel);
+        szYTickLabel = (int)fm.getStringBounds("1.0", g).getWidth();    
+        
+        // set up a font for the words too (shouldn't be in "getFixedSizes", but oh well)
+        fWord = new Font("SansSerif", Font.BOLD, 20);
+        fWordMetrics = g.getFontMetrics(fWord);
+    }
+    
+    /**
+     * Plot just the stuff inside the box.
+     *
+     * @param plotRect      rectangle defining the relative location of the box in the panel
+     * @param g2            graphics context
+     */
+    protected void plotData(Rectangle plotRect, Graphics2D g2)
+    {
+        final int xBoxMargin = 10;
+        final int yBoxMargin = 5;
+        
+        // make the background white
+        g2.setColor(Color.WHITE);
+        g2.fill(plotRect);
+        
+        if (data == null)
+            return;
+        
+        // pixels per time step
+        double boxWidth = plotRect.getWidth() / cols;
+        
+        // loop invariant
+        g2.setFont(fWord);
+        
+        // identify locations in the data array worth displaying
+        for(int col = 0; col < data[0].length; col++)            
+        {
+            for (int row = 0; row < data.length; row++)
+            {                
+                // loop invariant
+                g2.setColor(palette[row % 10]);
+                
+                if((col==0&&                   
+                        data[row][col]>data[row][col+1]&&
+                        data[row][col]>((maxVal-minVal)*0.01))
+                        ||(col==data[0].length&&
+                        data[row][col]>data[row][col-1]&&
+                        data[row][col]>((maxVal-minVal)*0.01))
+                        ||(col>0&&col<data[0].length&&
+                        data[row][col]>((maxVal-minVal)*0.01)&& 
+                        data[row][col]>data[row][col-1]&&                   
+                        data[row][col]>data[row][col+1]))
+                {
+                    // display this one
+
+                    // rescale the activation value
+                    double value = (data[row][col] - minVal) / (maxVal - minVal);
+
+                    // get the string to display
+                    String sDisplay = wordLabels[row].trim();
+
+                    // do loop-invariant calc
+                    int yCharLoc = (int)Math.round(plotRect.getY() + (1-value) * plotRect.getHeight());
+                    // for each character
+                    for (int c = 0; c < sDisplay.length(); c++)
+                    {
+                        // get the char as a string
+                        String ch = sDisplay.substring(c,c+1);
+                        // where does it go?
+                        int xCharLoc = (int)Math.round(plotRect.getX() + (col + (c * deltaInput)) * boxWidth);
+                        // display it
+                        g2.drawString(ch, xCharLoc, yCharLoc);
+                    }
+
+                    // calculate size & position of the box
+                    Rectangle boxRect = new Rectangle();
+                    // width of displayed chars, + extra for last char, +margins
+                    boxRect.setSize((int)Math.round((sDisplay.length()-1) * deltaInput * boxWidth +
+                            fWordMetrics.charWidth('n') + 
+                            xBoxMargin * 2),
+                            (int)Math.round(fWordMetrics.getHeight() + yBoxMargin * 2));
+                    boxRect.setLocation((int)Math.round(plotRect.getX() + col * boxWidth - xBoxMargin),
+                            (int)Math.round(yCharLoc - fWordMetrics.getHeight() - yBoxMargin));
+
+                    // and display it
+                    g2.draw(boxRect);
+                } 
+            }
+        }        
+    }
+    
+    /** 
+     * Plot the tick marks. For the Y axis, plot just from 0 to 1
+     */
+    protected void plotTicks(Rectangle plotRect, Graphics2D g2)
+    {
+        int tickLength = (int)(szSmallBuf * .7);
+        
+        double boxHeight = plotRect.getHeight() / rows;
+        double boxWidth = plotRect.getWidth() / cols;
+       
+        g2.setColor(Color.BLACK);
+        g2.setFont(fTickLabel);
+        
+        // plot 10 Y tick marks/labels
+        // foreach col, plot a tick mark.
+        // and plot 15 X tick labels
+        
+        // plot if row % rowLabelInterval == 0, and likewise
+        int colLabelInterval = (int)(cols / 15);
+        
+        
+        
+        for (int yTick = 0; yTick <= 10; yTick++)
+        {
+            double tickFrac = yTick / 10f;
+            
+            // position of each tick mark
+            int yPos = (int)Math.round(plotRect.getY() + tickFrac * plotRect.getHeight());
+            
+            // draw the tick mark
+            g2.drawLine((int)Math.round(plotRect.getX() - tickLength), yPos, 
+                    (int)Math.round(plotRect.getX()), yPos);
+            
+            // compute the size of this label
+            String label = form.format(1-tickFrac);
+            Rectangle2D labelRect =(g2.getFontMetrics(fTickLabel)).getStringBounds(label, g2);
+
+            // label is right-justified and middle-justified on the tick mark
+            int xLabelPos = (int)Math.round(plotRect.getX() - szSmallBuf - labelRect.getWidth());
+            int yLabelPos = (int)Math.round(yPos + labelRect.getHeight() / 2);
+
+            g2.drawString(label, xLabelPos, yLabelPos);
+        }
+        
+        
+        for (int col = 0; col < cols; col++)
+        {
+            // position of the left of each column
+            int xPos = (int)Math.round(plotRect.getX() + (col * boxWidth));
+            
+            // draw the tick mark
+            g2.drawLine(xPos, (int)Math.round(plotRect.getY() + plotRect.getHeight()),
+                    xPos, (int)Math.round(plotRect.getY() + plotRect.getHeight() + tickLength));
+            
+            if (col % colLabelInterval == 0)
+            {
+                // compute the size of this label
+                String label = Integer.toString(col);
+                Rectangle2D labelRect =(g2.getFontMetrics(fTickLabel)).getStringBounds(label, g2);
+                
+                // lower-left of label is a szSmallBuf + szTickLabel below the plot and centered on its tickmark
+                int xLabelPos = (int)Math.round(xPos - labelRect.getWidth() / 2);
+                int yLabelPos = (int)Math.round(plotRect.getY() + plotRect.getHeight() + szSmallBuf + szXTickLabel);
+                
+                g2.drawString(label, xLabelPos, yLabelPos);
+                
+            }
+        }
+    }
+}
+
+
+/*
+     * Plot just the stuff inside the box.
+     *
+     * @param plotRect      rectangle defining the relative location of the box in the panel
+     * @param g2            graphics context
+     *
+    protected void plotData(Rectangle plotRect, Graphics2D g2)
+    {
+        final int xBoxMargin = 10;
+        final int yBoxMargin = 5;
+        
+        // make the background white
+        g2.setColor(Color.WHITE);
+        g2.fill(plotRect);
+        
+        if (data == null)
+            return;
+        
+        // pixels per time step
+        double boxWidth = plotRect.getWidth() / cols;
+        
+        // loop invariant
+        g2.setFont(fWord);
+        
+        // identify locations in the data array worth displaying
+        for (int row = 0; row < data.length; row++)
+        {
+            int bestCol=0;  // 
+            
+            for(int col = 0; col < data[0].length; col++)
+            {
+                if (data[row][col] > data[row][bestCol]) bestCol=col;
+            }
+            
+            // loop invariant
+            g2.setColor(palette[row % 10]);
+                
+            if(data[row][bestCol]>((maxVal-minVal)*0.01))
+            {
+                // display this one
+                
+                // rescale the activation value
+                double value = (data[row][bestCol] - minVal) / (maxVal - minVal);
+                
+                // get the string to display
+                String sDisplay = wordLabels[row].trim();
+                
+                // do loop-invariant calc
+                int yCharLoc = (int)Math.round(plotRect.getY() + (1-value) * plotRect.getHeight());
+                // for each character
+                for (int c = 0; c < sDisplay.length(); c++)
+                {
+                    // get the char as a string
+                    String ch = sDisplay.substring(c,c+1);
+                    // where does it go?
+                    int xCharLoc = (int)Math.round(plotRect.getX() + (bestCol + (c * deltaInput)) * boxWidth);
+                    // display it
+                    g2.drawString(ch, xCharLoc, yCharLoc);
+                }
+                
+                // calculate size & position of the box
+                Rectangle boxRect = new Rectangle();
+                // width of displayed chars, + extra for last char, +margins
+                boxRect.setSize((int)Math.round((sDisplay.length()-1) * deltaInput * boxWidth +
+                        fWordMetrics.charWidth('n') + 
+                        xBoxMargin * 2),
+                        (int)Math.round(fWordMetrics.getHeight() + yBoxMargin * 2));
+                boxRect.setLocation((int)Math.round(plotRect.getX() + bestCol * boxWidth - xBoxMargin),
+                        (int)Math.round(yCharLoc - fWordMetrics.getHeight() - yBoxMargin));
+                
+                // and display it
+                g2.draw(boxRect);
+            }                     
+        }
+        
+    }
+    */

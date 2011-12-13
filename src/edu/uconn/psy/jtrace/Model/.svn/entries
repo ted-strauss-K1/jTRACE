@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="209"
+   name=""
+   committed-date="2005-08-22T20:25:55.413954Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu/uconn/psy/jtrace/Model"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="209"/>
+<entry
+   committed-rev="199"
+   name="TraceParam.java"
+   text-time="2005-07-13T19:14:40.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="2c904ec582c94dd97066e1218dee4776"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-26T20:13:22.000000Z"/>
+<entry
+   committed-rev="199"
+   name="TraceLexicon.java"
+   text-time="2005-07-13T19:14:58.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="0947e850a2774be65f83af1e376254e2"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-12T16:39:24.000000Z"/>
+<entry
+   committed-rev="1"
+   name="GaussianDistr.java"
+   text-time="2005-03-25T22:17:09.000000Z"
+   committed-date="2005-03-24T23:19:51.021048Z"
+   checksum="63cb1bdaa7d96b6c9140838409a56b20"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-03-25T22:17:08.000000Z"/>
+<entry
+   committed-rev="128"
+   name="NoGuiTest.java"
+   text-time="2005-06-03T17:44:54.000000Z"
+   committed-date="2005-06-04T04:31:39.089450Z"
+   checksum="daba5609c5681d694fcb33472e852a00"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-24T02:23:33.000000Z"/>
+<entry
+   name="Scripting"
+   kind="dir"/>
+<entry
+   committed-rev="210"
+   name="TraceDecisionRule.java"
+   text-time="2005-08-21T16:53:25.000000Z"
+   committed-date="2005-08-23T15:16:31.866835Z"
+   checksum="00fe8f8387525dfd1fc87736b55a2fd9"
+   last-author="ted"
+   kind="file"
+   revision="210"/>
+<entry
+   committed-rev="199"
+   name="TraceNet.java"
+   text-time="2005-07-13T18:11:09.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="f88324743c709ca40e1dc03f212417ac"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-12T16:39:24.000000Z"/>
+<entry
+   committed-rev="173"
+   name="TraceSim.java"
+   text-time="2005-06-28T19:47:51.000000Z"
+   committed-date="2005-06-29T06:56:46.354760Z"
+   checksum="7adba582805d09115b408a0da2a90ae1"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-05-24T02:23:33.000000Z"/>
+<entry
+   committed-rev="1"
+   name="TraceError.java"
+   text-time="2005-03-25T22:17:09.000000Z"
+   committed-date="2005-03-24T23:19:51.021048Z"
+   checksum="3bc191ba5b36fdce623c1d253d41090b"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-03-25T22:17:08.000000Z"/>
+<entry
+   committed-rev="180"
+   name="TraceWord.java"
+   text-time="2005-07-04T22:50:32.000000Z"
+   committed-date="2005-06-30T17:30:23.911985Z"
+   checksum="78321f7bad1f23cf920cdf983ada181a"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-04T22:50:32.000000Z"/>
+<entry
+   committed-rev="212"
+   name="TraceSimAnalysis.java"
+   text-time="2005-09-04T15:31:02.000000Z"
+   committed-date="2005-09-04T16:18:09.555688Z"
+   checksum="e553d109d4effffb306f4ee75670fb4b"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"
+   revision="212"/>
+<entry
+   committed-rev="206"
+   name="TracePhones.java"
+   text-time="2005-08-23T15:05:58.000000Z"
+   committed-date="2005-08-15T21:48:51.987854Z"
+   checksum="6ef06cb4fc8f4d2c779c1a1912e87c19"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"/>
+<entry
+   committed-rev="1"
+   name="TraceException.java"
+   text-time="2005-03-25T22:17:09.000000Z"
+   committed-date="2005-03-24T23:19:51.021048Z"
+   checksum="05375914300b4550270667dd29b9c323"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-03-25T22:17:09.000000Z"/>
+</wc-entries>

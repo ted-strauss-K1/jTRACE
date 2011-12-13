@@ -1,0 +1,450 @@
+/*
+ * TraceSim.java
+ *
+ * Created on May 4, 2005, 4:34 PM
+ */
+
+package edu.uconn.psy.jtrace.Model;
+
+import edu.uconn.psy.jtrace.Model.*;
+import java.io.*;       // for export
+import java.text.DecimalFormat;
+
+/**
+ * Wrapper around TraceNet, with the full history of the sim, etc.
+ *
+ * @author Harlan Harris
+ */
+public class TraceSim {
+    
+    private TraceNet tn;
+    private TraceParam tp;
+    
+    // full history of TraceNet object
+    private double [][][] inputD;
+    private double [][][] featureD;
+    private double [][][] phonemeD;
+    private double [][][] wordD;
+    
+    // computed maximum size of various things
+    private int maxDuration;
+
+    /**
+     * Holds value of property paramUpdateCt.
+     */
+    private long paramUpdateCt;
+
+    /**
+     * Holds value of property stepsRun.
+     */
+    private int stepsRun;
+
+    /**
+     * Utility field used by bound properties.
+     */
+    private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport (this);
+
+    /**
+     * Holds value of property inputString.
+     */
+    private String inputString;
+
+    /**
+     * Getter for property stepsRun.
+     * @return Value of property stepsRun.
+     */
+    public int getStepsRun() {
+
+        return this.stepsRun;
+    }
+
+    /**
+     * Getter for property inputString.
+     * @return Value of property inputString.
+     */
+    public String getInputString() {
+
+        return this.inputString;
+    }
+
+    /**
+     * Setter for property inputString.
+     * @param inputString New value of property inputString.
+     */
+    public void setInputString(String inputString) {
+
+        this.inputString = inputString;
+    }
+
+    /**
+     * Getter for property paramUpdateCt.
+     * @return Value of property paramUpdateCt.
+     */
+    public long getParamUpdateCt() {
+
+        return this.paramUpdateCt;
+    }
+    
+    
+    /** Creates a new instance of TraceSim */
+    public TraceSim(TraceParam _tp) {
+        // initialize param and net objects
+        tp = _tp;
+        tn = new TraceNet(tp);
+        
+        paramUpdateCt = tp.getUpdateCt();
+        
+        reset();
+    }
+
+    /** Reset the TraceSim object. */
+    public void reset() {
+        // first, the TraceNet object
+        tn.reset();
+        
+        stepsRun = 0;
+        
+        // input string (only one now)
+        inputString = tp.getModelInput();
+        
+        tn.createInput(inputString);         
+        
+        // initialize our internal arrays
+        maxDuration = 6 * inputString.length() * tp.getDeltaInput();                
+        if (maxDuration < tp.getFSlices()) 
+            maxDuration = tp.getFSlices();
+        inputD = new double[maxDuration][][];
+        featureD = new double[maxDuration][][];
+        phonemeD = new double[maxDuration][][];
+        wordD = new double[maxDuration][][];
+        
+        // store initial set of data
+        
+	double[][] in=tn.getInputLayer();
+        double[][] ft=tn.getFeatureLayer();
+        double[][] ph=tn.getPhonemeLayer();
+        double[][] wd=tn.getWordLayer();
+        
+        inputD[stepsRun]=new double[in.length][in[0].length];
+        for(int i=0;i<in.length;i++)
+            for(int j=0;j<in[0].length;j++)
+                inputD[stepsRun][i][j]=in[i][j];
+        featureD[stepsRun]=new double[ft.length][ft[0].length];
+        for(int i=0;i<ft.length;i++)
+            for(int j=0;j<ft[0].length;j++)
+                featureD[stepsRun][i][j]=ft[i][j];
+        phonemeD[stepsRun]=new double[ph.length][ph[0].length];
+        for(int i=0;i<ph.length;i++)
+            for(int j=0;j<ph[0].length;j++)
+                phonemeD[stepsRun][i][j]=ph[i][j];
+        wordD[stepsRun]=new double[wd.length][wd[0].length];
+        for(int i=0;i<wd.length;i++)
+            for(int j=0;j<wd[0].length;j++)
+                wordD[stepsRun][i][j]=wd[i][j];
+    }
+
+    /**
+     * Run the model the specified number of times. Internal state is stored.
+     * If parameters have updated, reset first. The number of completed steps
+     * is returned.
+     *
+     * @param numCycles     number of cycles to run
+     * @return              total cumulative number of steps run in the model
+     */
+    public int cycle(int numCycles) {
+        checkForParamUpdate();
+        
+        if(numCycles > maxDuration) 
+            numCycles = maxDuration;
+            
+        for (int c = 0; c < numCycles; c++)
+        {            
+            // get references to the data
+            double[][] in=tn.getInputLayer();
+            double[][] ft=tn.getFeatureLayer();
+            double[][] ph=tn.getPhonemeLayer();
+            double[][] wd=tn.getWordLayer();
+            
+            // and store it for others to peruse
+            try{
+                inputD[stepsRun]=new double[in.length][in[0].length];
+                for(int i=0;i<in.length;i++)
+                    for(int j=0;j<in[0].length;j++)
+                        inputD[stepsRun][i][j]=in[i][j];
+                featureD[stepsRun]=new double[ft.length][ft[0].length];
+                for(int i=0;i<ft.length;i++)
+                    for(int j=0;j<ft[0].length;j++)
+                        featureD[stepsRun][i][j]=ft[i][j];
+                phonemeD[stepsRun]=new double[ph.length][ph[0].length];
+                for(int i=0;i<ph.length;i++)
+                    for(int j=0;j<ph[0].length;j++)
+                        phonemeD[stepsRun][i][j]=ph[i][j];
+                wordD[stepsRun]=new double[wd.length][wd[0].length];
+                for(int i=0;i<wd.length;i++)
+                    for(int j=0;j<wd[0].length;j++)
+                        wordD[stepsRun][i][j]=wd[i][j];
+            }
+            catch(Exception e){e.printStackTrace();}
+            
+            stepsRun++;
+            
+            tn.cycle();            
+        }
+        
+        return stepsRun;
+    }
+    
+    public double validateAgainst(double[][][][] validationD){
+        //order: input, feature, phoneme, word
+        double[][][][] differenceD = new double[4][][][];
+        differenceD[0]=new double[java.lang.Math.min(validationD[0].length,inputD.length)][java.lang.Math.min(validationD[0][0].length,inputD[0].length)][java.lang.Math.min(validationD[0][0][0].length,inputD[0][0].length)];
+        differenceD[1]=new double[java.lang.Math.min(validationD[1].length,featureD.length)][java.lang.Math.min(validationD[1][0].length,featureD[0].length)][java.lang.Math.min(validationD[1][0][0].length,featureD[0][0].length)];
+        differenceD[2]=new double[java.lang.Math.min(validationD[2].length,phonemeD.length)][java.lang.Math.min(validationD[2][0].length,phonemeD[0].length)][java.lang.Math.min(validationD[2][0][0].length,phonemeD[0][0].length)];
+        differenceD[3]=new double[java.lang.Math.min(validationD[3].length,wordD.length)][java.lang.Math.min(validationD[3][0].length,wordD[0].length)][java.lang.Math.min(validationD[3][0][0].length,wordD[0][0].length)];
+        
+        double SMAD = 0;
+        int SMAD_ct = 0;
+        for(int i=0;i<differenceD[0].length;i++)
+            for(int j=0;j<differenceD[0][0].length;j++)
+                for(int k=0;k<differenceD[0][0][0].length;k++){
+                    differenceD[0][i][j][k] = java.lang.Math.abs(validationD[0][i][j][k] - inputD[i][j][k]);
+                    SMAD += java.lang.Math.abs(validationD[0][i][j][k] - inputD[i][j][k]);
+                    SMAD_ct++;
+                }
+        for(int i=0;i<differenceD[1].length;i++)
+            for(int j=0;j<differenceD[1][0].length;j++)
+                for(int k=0;k<differenceD[1][0][0].length;k++){
+                    differenceD[1][i][j][k] = java.lang.Math.abs(validationD[1][i][j][k] - featureD[i][j][k]);
+                    SMAD += java.lang.Math.abs(validationD[1][i][j][k] - featureD[i][j][k]);
+                    SMAD_ct++;
+                }
+        for(int i=0;i<differenceD[2].length;i++)
+            for(int j=0;j<differenceD[2][0].length;j++)
+                for(int k=0;k<differenceD[2][0][0].length;k++){
+                    differenceD[2][i][j][k] = java.lang.Math.abs(validationD[2][i][j][k] - phonemeD[i][j][k]);
+                    SMAD += java.lang.Math.abs(validationD[2][i][j][k] - phonemeD[i][j][k]);
+                    SMAD_ct++;
+                }
+        for(int i=0;i<differenceD[3].length;i++)
+            for(int j=0;j<differenceD[3][0].length;j++)
+                for(int k=0;k<differenceD[3][0][0].length;k++){
+                    differenceD[3][i][j][k] = java.lang.Math.abs(validationD[3][i][j][k] - wordD[i][j][k]);
+                    SMAD += java.lang.Math.abs(validationD[3][i][j][k] - wordD[i][j][k]);
+                    SMAD_ct++;
+                }
+        
+        inputD = differenceD[0];
+        featureD = differenceD[1];
+        phonemeD = differenceD[2];
+        wordD = differenceD[3];
+        maxDuration = inputD.length;
+        stepsRun = maxDuration;
+        
+        SMAD /= SMAD_ct;
+        SMAD *= 100;
+        
+        //paramUpdateCt++;
+        return SMAD;
+    }
+    /**
+     * Adds a PropertyChangeListener to the listener list.
+     * @param l The listener to add.
+     */
+    public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
+
+        propertyChangeSupport.addPropertyChangeListener (l);
+    }
+
+    /**
+     * Removes a PropertyChangeListener from the listener list.
+     * @param l The listener to remove.
+     */
+    public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
+
+        propertyChangeSupport.removePropertyChangeListener (l);
+    }
+
+    /**
+     * Getter for property inputD.
+     * @return Value of property inputD.
+     */
+    public double[][][] getInputD() {
+
+        return this.inputD;
+    }
+
+    /**
+     * Getter for property featureD.
+     * @return Value of property featureD.
+     */
+    public double[][][] getFeatureD() {
+
+        return this.featureD;
+    }
+
+    /**
+     * Getter for property phonemeD.
+     * @return Value of property phonemeD.
+     */
+    public double[][][] getPhonemeD() {
+
+        return this.phonemeD;
+    }
+
+    /**
+     * Getter for property wordD.
+     * @return Value of property wordD.
+     */
+    public double[][][] getWordD() {
+
+        return this.wordD;
+    }
+
+    /**
+     * If the param object has been updated, reset.
+     */
+    private void checkForParamUpdate() {
+        if (tp.getUpdateCt() > paramUpdateCt)
+        {
+            paramUpdateCt = tp.getUpdateCt();
+            
+            reset();
+        }
+    }
+
+    public TraceParam getParameters() {
+        return tp;
+    }
+    public void setParameters(TraceParam _tp){
+        tp = _tp;
+    }
+
+    /**
+     * Getter for property maxDuration.
+     * @return Value of property maxDuration.
+     */
+    public int getMaxDuration() {
+
+        return this.maxDuration;
+    }
+    
+    public String XMLTag(){
+        String result="";
+        result+="<action>";
+        result+="<set-parameters>";
+        result+=tp.XMLTag();
+        result+="</set-parameters>";
+        result+="</action>";       
+        //result+="<action><name>load-sim-from-file</name></action>";
+        return result;
+    }
+    /**
+     * Export this sim to a directory tree. Subdirectories of the specified
+     * directory are created called "input", "feature", "phoneme", and "word".
+     * Each file is called <timestep>.dat, e.g., 17.dat. Each file contains the
+     * state of its matrix at that timestep, in the same orientation as the
+     * graphs on the sim panel (rows = items, cols = time slices). The first
+     * column is a label for each row. Note that this will happily over-write
+     * data, so if you don't want that, check before calling this method. Also
+     * note that this may take a while, so in a GUI, you might set up an hourglass
+     * cursor...
+     *
+     * @param directory     directory to save to
+     * @returns             always true -- throws exception if not.
+     */
+    public boolean export(java.io.File directory) throws IOException
+    {
+        FileWriter out;
+        
+        String sep = ", ";
+        
+        DecimalFormat outFormat = new DecimalFormat("0.0000");
+        
+        double [][][][] alldata = new double [4][][][];
+        String [] alldataNames = {"input", "feature", "phoneme", "word"};
+        
+        // for simplicity, make a big meta-array of all data
+        alldata[0] = inputD;
+        alldata[1] = featureD;
+        alldata[2] = phonemeD;
+        alldata[3] = wordD;
+        
+//        try
+//        {
+            // create directory
+            if (!directory.isDirectory())
+            {
+                if (!directory.mkdirs())
+                    throw new IOException("directory.mkdirs() failed");
+            }
+
+            // foreach subdirectory
+            for (int subdir = 0; subdir < 4; subdir++)
+            {
+                // create the subdirectory
+                File subdirFile = new File(directory, alldataNames[subdir]);
+                if (!subdirFile.isDirectory() && !subdirFile.mkdir())
+                    throw new IOException("subdirFile.mkdir() failed");
+
+                // foreach timestep
+                for (int iStepsRun = 0; iStepsRun < stepsRun; iStepsRun++)
+                {
+                    File stepFile = new File(subdirFile, Integer.toString(iStepsRun) + ".dat");
+                    
+                    // open that file
+                    out = new FileWriter(stepFile);
+
+                    // foreach item
+                    for (int iItem = 0; iItem < alldata[subdir][iStepsRun].length; iItem++)
+                    {
+                        // figure out the item name, and write
+                        switch (subdir)
+                        {
+                            case 0: // input
+                                // @@@ just use index
+                                out.write(Integer.toString(iItem));
+                                break;
+                            case 1: // features
+                                // @@@ just use index
+                                out.write(Integer.toString(iItem));
+                                break;
+                            case 2: // phonemes
+                                // use phoneme index from TracePhones
+                                out.write(TracePhones.labels[iItem]);
+                                break;
+                            case 3: // words
+                                // use word index from TraceParam
+                                out.write(tp.getDictionary().get(iItem).getPhon());;
+                                break;
+                        }
+                        out.write(sep);
+
+                        // foreach time slice
+                        for (int iSlice = 0; iSlice < alldata[subdir][iStepsRun][iItem].length; iSlice++)
+                        {
+                            // output the data
+                            out.write(outFormat.format(alldata[subdir][iStepsRun][iItem][iSlice]));
+                            
+                            if (iSlice != alldata[subdir][iStepsRun][iItem].length - 1)
+                                out.write(sep);
+                            
+                        }
+                        
+                        out.write("\n");
+                    }
+                    
+                    // close the file
+                    out.close();
+                }
+            }
+//        }
+//        catch (IOException ex)
+//        {
+//            return false;
+//        }
+        
+        return true;
+        
+    }
+    
+}

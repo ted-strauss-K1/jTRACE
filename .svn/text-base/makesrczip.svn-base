@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+# Usage: makesrczip 
+
+# Extracts the version number from SVN
+
+$verline = `svn info | grep "Last Changed Rev"`;
+
+($ver) = $verline =~ /Rev: (\d+)/;
+
+#print "$ver:\n";
+
+$cmd = "zip jtrace-src-$ver.zip nbproject/*xml nbproject/*properties build.xml " .
+	"src/edu/uconn/psy/jtrace/Model/*java " .
+	"src/edu/uconn/psy/jtrace/Model/Scripting/*java " .
+	"src/edu/uconn/psy/jtrace/Model/Scripting/impl/*java " .
+	"src/edu/uconn/psy/jtrace/IO/*java " .
+	"src/edu/uconn/psy/jtrace/UI/*java " .
+	"src/edu/uconn/psy/jtrace/UI/*form " .
+	"src/edu/uconn/psy/jtrace/jTRACESchema.xsd " .
+	"manifest.mf " .
+	"package/gallery/*jt " .
+	"package/lexicons/*jt " .
+	"package/templates/*jt " .
+	"package/docs/manual.html " .
+	"package/docs/pix/*jpg " .
+	"package/LICENSE.txt " .
+	"package/THIRDPARTYLICENSE.txt " .
+	"package/libs/*jar " .
+        "package/schema/* " .
+	"package/makepackage " .
+	"package/jtrace.bat package/jtrace.sh " .
+	"programmers-guide.html " .
+	"makesrczip";
+
+print "$cmd\n";
+
+`$cmd`;
+

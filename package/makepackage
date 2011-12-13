@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Usage: makepackage jtrace-version.zip
+
+cp ../dist/jTRACE.jar .
+cp ../src/edu/uconn/psy/jtrace/jTRACESchema.xsd schema/
+zip $1 docs/*html docs/*pdf libs/*jar gallery/*jt jTRACE.jar jtrace.bat jtrace.sh lexicons/*jt LICENSE.txt THIRDPARTYLICENSE.txt README.txt templates/*jt schema/*xsd schema/jt.xui
+mv $1.zip ~/Maglab/jtrace/tooled\ versions/$1.zip
+unzip ~/Maglab/jtrace/tooled\ versions/$1.zip -d /ted/projects/jtrace/$1
+

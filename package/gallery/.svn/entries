@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="198"
+   name=""
+   committed-date="2005-07-13T23:05:38.897863Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/package/gallery"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="202"/>
+<entry
+   committed-rev="195"
+   name="phoneme ambiguity.jt"
+   text-time="2005-07-12T01:40:05.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="2603d6c218378e0f1f6bb12564ceec00"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:40.000000Z"/>
+<entry
+   committed-rev="195"
+   name="short sentences.jt"
+   text-time="2005-07-12T01:43:14.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="13b548dda0e70437c95238a8a944a24a"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:40.000000Z"/>
+<entry
+   committed-rev="195"
+   name="word segmentation.jt"
+   text-time="2005-07-12T01:45:11.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="257672ac853c058e734445f182155627"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:41.000000Z"/>
+<entry
+   committed-rev="195"
+   name="word recognition.jt"
+   text-time="2005-07-12T01:44:24.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="c171487619e9961c7735817be5541152"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:41.000000Z"/>
+<entry
+   committed-rev="195"
+   name="lexical conspiracy 1.jt"
+   text-time="2005-07-12T01:37:21.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="9485e8230def83dc959a8019d9c5928d"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:41.000000Z"/>
+<entry
+   committed-rev="195"
+   name="lexical conspiracy 2.jt"
+   text-time="2005-07-12T01:38:16.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="44156d76d80c752b014a6a8ef4e58166"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:41.000000Z"/>
+<entry
+   committed-rev="195"
+   name="word-final lexical effect.jt"
+   text-time="2005-07-12T01:46:11.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="8202c8ea763c3ffec2636fd3110177eb"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:42.000000Z"/>
+<entry
+   committed-rev="195"
+   name="basic lexical effect 1.jt"
+   text-time="2005-07-12T01:35:21.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="3595550f186b869ce5cb363d680c8512"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:42.000000Z"/>
+<entry
+   committed-rev="195"
+   name="reaction time effect 1.jt"
+   text-time="2005-07-12T01:41:11.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="c051588bfef90e70579c589d65719d23"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:42.000000Z"/>
+<entry
+   committed-rev="195"
+   name="reaction time effect 2.jt"
+   text-time="2005-07-12T01:42:07.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="5e8810209947e7ed48f3c8f3bc9aa149"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:43.000000Z"/>
+<entry
+   committed-rev="195"
+   name="basic lexical effect 2.jt"
+   text-time="2005-07-12T01:36:31.000000Z"
+   committed-date="2005-07-12T14:26:45.589019Z"
+   checksum="11f06c9a211d21e90e32bdf2d8e66d1e"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-06-29T05:56:43.000000Z"/>
+<entry
+   committed-rev="198"
+   name="nonword boundaries.jt"
+   text-time="2005-07-14T13:46:24.000000Z"
+   committed-date="2005-07-13T23:05:38.897863Z"
+   checksum="557e1d5c89574646abaa8074ca7feed6"
+   last-author="harlan"
+   kind="file"
+   prop-time="2005-07-14T13:46:24.000000Z"/>
+</wc-entries>

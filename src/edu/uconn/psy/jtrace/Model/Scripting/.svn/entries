@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="209"
+   name=""
+   committed-date="2005-08-22T20:25:55.413954Z"
+   url="svn://merganser.psy.uconn.edu/jtrace/trunk/src/edu/uconn/psy/jtrace/Model/Scripting"
+   last-author="harlan"
+   kind="dir"
+   uuid="1d37fc00-17f3-0310-8b53-c1af53cd6ed8"
+   revision="209"/>
+<entry
+   committed-rev="196"
+   name="Expression.java"
+   text-time="2005-07-12T20:45:09.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="25df6e67fd81683708cab27013afa00a"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="Predicate.java"
+   text-time="2005-07-13T19:13:29.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="4653c2c59a3fb68992dc8775aedb16e2"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="Conditional.java"
+   text-time="2005-07-12T20:47:00.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="9a37829598a2e7a2f9515cb6701aaf2f"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="FileLocator.java"
+   text-time="2005-07-13T19:14:00.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="d5765c8232d0cc5380be7bfd8c28a76d"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="Query.java"
+   text-time="2005-07-13T19:13:20.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="fc9a48ad4011e9c1d6961de53f4af5ef"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="Primitive.java"
+   text-time="2005-07-13T19:12:05.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="5c433926077613d03030978b648d74d5"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="ListOfPrimitives.java"
+   text-time="2005-07-13T19:13:39.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="3bdf22eb175298e5f3b02ae13e94c292"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="Action.java"
+   text-time="2005-07-12T20:20:46.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="6226345316ea7b7a9effba6dec18f4e9"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="Boolean.java"
+   text-time="2005-07-13T19:16:25.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="0e723ece7ea6131b75aa9accbde77f50"
+   last-author="ted"
+   kind="file"/>
+<entry
+   name="impl"
+   kind="dir"/>
+<entry
+   committed-rev="211"
+   name="TraceScript.java"
+   text-time="2005-08-24T13:22:54.000000Z"
+   committed-date="2005-08-29T20:49:56.779486Z"
+   checksum="8ec68dc7203af6c27cf13f64bf9ffc14"
+   last-author="ted"
+   kind="file"
+   prop-time="2005-08-23T15:05:58.000000Z"
+   revision="211"/>
+<entry
+   committed-rev="199"
+   name="Text.java"
+   text-time="2005-07-13T19:13:06.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="ef95d17db9007bd353d59afcbe886a11"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="196"
+   name="Iterator.java"
+   text-time="2005-07-12T20:47:34.000000Z"
+   committed-date="2005-07-13T07:23:27.738292Z"
+   checksum="d2eaeb9fbe0b9d96afe1d185383adc16"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="Int.java"
+   text-time="2005-07-13T19:13:46.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="22d85cdaa47b939dc37535474939fbea"
+   last-author="ted"
+   kind="file"/>
+<entry
+   committed-rev="199"
+   name="Decimal.java"
+   text-time="2005-07-13T19:14:06.000000Z"
+   committed-date="2005-07-14T15:25:11.274322Z"
+   checksum="857ebceeae936f24b890063a65715c2e"
+   last-author="ted"
+   kind="file"/>
+</wc-entries>
